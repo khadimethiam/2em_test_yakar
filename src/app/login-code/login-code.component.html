@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Page de connexion</title>
+  </head>
+  <body>
+    <div class="container">
+      <div class="img">
+        <img src="/images/tes.png" alt="logo" />
+      </div>
+      <div class="login-content">
+        <form (ngSubmit)="onLogin()">
+          <img src="/images/profil.png" alt="profil" />
+          <h2 class="title">Projet Yakar</h2>
+
+          <!-- Champ de saisie pour le code secret -->
+          <div class="code-input">
+            <input
+              type="text"
+              maxlength="1"
+              (input)="onInput($event, 0)"
+              [(ngModel)]="code[0]"
+              name="code0"
+            />
+            <input
+              type="text"
+              maxlength="1"
+              (input)="onInput($event, 1)"
+              [(ngModel)]="code[1]"
+              name="code1"
+            />
+            <input
+              type="text"
+              maxlength="1"
+              (input)="onInput($event, 2)"
+              [(ngModel)]="code[2]"
+              name="code2"
+            />
+            <input
+              type="text"
+              maxlength="1"
+              (input)="onInput($event, 3)"
+              [(ngModel)]="code[3]"
+              name="code3"
+            />
+            <input
+              type="text"
+              maxlength="1"
+              (input)="onInput($event, 4)"
+              [(ngModel)]="code[4]"
+              name="code4"
+            />
+          </div>
+
+          <a href="#">Mot de passe oublié?</a>
+          <!-- Bouton pour basculer vers la page de connexion -->
+          <button
+            type="button"
+            class="btn switch-btn"
+            (click)="switchToLogin()"
+          >
+            Se connecter avec M-D-P
+          </button>
+
+          <!-- Section des icônes pour les réseaux sociaux -->
+          <div class="social-login">
+            <p>Ou connectez-vous avec</p>
+            <a href="#" class="social-icon google"
+              ><i class="fab fa-google"></i
+            ></a>
+            <a href="#" class="social-icon facebook"
+              ><i class="fab fa-facebook-f"></i
+            ></a>
+            <a href="#" class="social-icon twitter"
+              ><i class="fab fa-twitter"></i
+            ></a>
+            <a href="#" class="social-icon instagram"
+              ><i class="fab fa-instagram"></i
+            ></a>
+          </div>
+
+          <!-- Message d'erreur -->
+          <div *ngIf="errorMessage" class="error-message">
+            {{ errorMessage }}
+          </div>
+        </form>
+      </div>
+    </div>
+  </body>
+</html>

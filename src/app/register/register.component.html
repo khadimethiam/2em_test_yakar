@@ -1,0 +1,43 @@
+<form (ngSubmit)="onRegister()">
+  <input
+    type="text"
+    [(ngModel)]="user.nom"
+    name="nom"
+    placeholder="Nom"
+    required
+  />
+  <input
+    type="text"
+    [(ngModel)]="user.prenom"
+    name="prenom"
+    placeholder="Prénom"
+    required
+  />
+  <input
+    type="email"
+    [(ngModel)]="user.email"
+    name="email"
+    placeholder="Email"
+    required
+  />
+  <input
+    type="text"
+    [(ngModel)]="user.numero_tel"
+    name="numero_tel"
+    placeholder="Numéro de téléphone"
+    required
+  />
+  <input
+    type="password"
+    [(ngModel)]="user.mot_de_passe"
+    name="mot_de_passe"
+    placeholder="Mot de passe"
+    required
+  />
+  <select [(ngModel)]="user.role" name="role" required>
+    <option value="admin">Admin</option>
+    <option value="user">User</option>
+  </select>
+  <button type="submit">S'inscrire</button>
+  <div *ngIf="errorMessage">{{ errorMessage }}</div>
+</form>

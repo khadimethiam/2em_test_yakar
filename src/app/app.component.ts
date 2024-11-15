@@ -1,13 +1,23 @@
-import { Component } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
+import { ThemeService } from './theme.service';
 
 @Component({
   selector: 'app-root',
-  standalone: true,
-  imports: [RouterOutlet],
   templateUrl: './app.component.html',
-  styleUrl: './app.component.css'
+  styleUrls: ['./app.component.css'],
+  standalone: true,
+  imports: [CommonModule, RouterModule],
 })
-export class AppComponent {
-  title = '2em_test_yakar';
+export class AppComponent implements OnInit {
+  constructor(public themeService: ThemeService) {}
+
+  ngOnInit() {
+    // Vous pouvez initialiser le mode ici si nécessaire
+  }
+
+  toggleMode() {
+    this.themeService.toggleMode();
+  }
 }
