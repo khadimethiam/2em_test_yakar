@@ -1,23 +1,40 @@
 const express = require("express");
 const http = require("http");
-const socketIo = require("socket.io");
 const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
 const bcrypt = require("bcryptjs");
 const cors = require("cors");
 const jwt = require("jsonwebtoken");
-const { SerialPort, ReadlineParser } = require("serialport");
+const multer = require("multer");
+const path = require("path");
+const fs = require("fs");
 
 const app = express();
 const server = http.createServer(app);
-const io = socketIo(server, {
-  cors: {
-    origin: "*",
+
+// Vérification et création du répertoire 'uploads' si nécessaire
+const uploadDir = path.join(__dirname, "uploads");
+
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir, { recursive: true });
+  console.log("Le répertoire 'uploads' a été créé.");
+}
+
+// Configuration de multer pour le téléchargement de fichiers (photo)
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "uploads/");
+  },
+  filename: (req, file, cb) => {
+    cb(null, Date.now() + path.extname(file.originalname));
   },
 });
 
+const upload = multer({ storage: storage });
+
 app.use(bodyParser.json());
 app.use(cors());
+app.use("/uploads", express.static("uploads")); // Pour servir les fichiers téléchargés
 
 // Connexion à MongoDB
 mongoose
@@ -30,23 +47,50 @@ mongoose
 
 // Modèle Utilisateur
 const UserSchema = new mongoose.Schema({
-  nom: String,
-  prenom: String,
+  nom: { type: String, required: true },
+  prenom: { type: String, required: true },
   email: { type: String, unique: true, required: true },
   numero_tel: { type: String, unique: true, required: true },
-  mot_de_passe: String,
-  code_authentification: String,
+  mot_de_passe: { type: String, required: true },
+  code_authentification: { type: String, required: true },
   role: { type: String, enum: ["admin", "user"], required: true },
+  photo: { type: String }, // Chemin de la photo
 });
 
 const User = mongoose.model("User", UserSchema);
 
-// Route d'inscription
-app.post("/register", async (req, res) => {
+// Middleware d'authentification
+const authMiddleware = (req, res, next) => {
+  const token = req.headers.authorization?.split(" ")[1];
+
+  if (!token) {
+    return res.status(401).json({ message: "Vous devez vous connecter d'abord" });
+  }
+
+  try {
+    const decoded = jwt.verify(token, "secret_key");
+    req.user = decoded; // Ajoute les informations de l'utilisateur à la requête
+    next();
+  } catch (err) {
+    return res.status(403).json({ message: "Token invalide ou expiré" });
+  }
+};
+
+// Middleware pour vérifier le rôle d'administrateur
+const adminMiddleware = (req, res, next) => {
+  if (req.user.role !== "admin") {
+    return res.status(403).json({ message: "Accès interdit, seul un administrateur peut inscrire des utilisateurs" });
+  }
+  next(); // Si le rôle est admin, on continue l'exécution
+};
+
+// Routes
+// 1. Inscription (Réservée aux administrateurs)
+app.post("/register", authMiddleware, adminMiddleware, upload.single("photo"), async (req, res) => {
   try {
     const { nom, prenom, email, numero_tel, mot_de_passe, role } = req.body;
+    const photo = req.file ? req.file.path : null;
 
-    // Vérifier si l'email ou le numéro de téléphone existe déjà
     const existingUser = await User.findOne({
       $or: [{ email }, { numero_tel }],
     });
@@ -67,10 +111,11 @@ app.post("/register", async (req, res) => {
       mot_de_passe: hashedPassword,
       code_authentification,
       role,
+      photo,
     });
 
     await newUser.save();
-    res.status(201).json({ message: "Utilisateur enregistré" });
+    res.status(201).json({ message: "Utilisateur enregistré avec succès" });
   } catch (err) {
     console.error("Erreur lors de l'inscription:", err);
     res.status(500).json({ message: "Erreur lors de l'inscription" });
@@ -109,6 +154,85 @@ app.post("/login", async (req, res) => {
   }
 });
 
+// 3. Déconnexion
+app.post("/logout", (req, res) => {
+  res.clearCookie('token'); // Effacer le cookie 'token'
+  // Supprimez le token côté client
+  res.status(200).json({ message: "Déconnexion réussie" });
+});
+
+// 4. Liste des utilisateurs (Accessible uniquement aux administrateurs)
+app.get("/users", authMiddleware, adminMiddleware, async (req, res) => {
+  try {
+    const users = await User.find();
+    res.status(200).json(users);
+  } catch (err) {
+    console.error("Erreur lors de la récupération des utilisateurs :", err);
+    res.status(500).json({ message: "Erreur serveur" });
+  }
+});
+
+// 5. Utilisateur par ID (Accessible uniquement aux administrateurs)
+app.get("/users/:id", authMiddleware, adminMiddleware, async (req, res) => {
+  try {
+    const id = req.params.id;
+
+    const user = await User.findById(id);
+
+    if (!user) {
+      return res.status(404).json({ message: "Utilisateur non trouvé" });
+    }
+
+    res.status(200).json(user);
+  } catch (err) {
+    console.error("Erreur lors de la récupération de l'utilisateur :", err);
+    res.status(500).json({ message: "Erreur serveur" });
+  }
+});
+
+// 6. Mise à jour utilisateur (Accessible uniquement aux administrateurs)
+app.put("/users/:id", authMiddleware, adminMiddleware, upload.single("photo"), async (req, res) => {
+  try {
+    const id = req.params.id;
+    const updates = req.body;
+
+    if (req.file) {
+      updates.photo = req.file.path;
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(id, updates, { new: true });
+
+    if (!updatedUser) {
+      return res.status(404).json({ message: "Utilisateur non trouvé" });
+    }
+
+    res
+      .status(200)
+      .json({ message: "Utilisateur mis à jour avec succès", user: updatedUser });
+  } catch (err) {
+    console.error("Erreur lors de la mise à jour :", err);
+    res.status(500).json({ message: "Erreur serveur" });
+  }
+});
+
+// 7. Suppression utilisateur (Accessible uniquement aux administrateurs)
+app.delete("/users/:id", authMiddleware, adminMiddleware, async (req, res) => {
+  try {
+    const userId = req.params.id;
+
+    const deletedUser = await User.findByIdAndDelete(userId);
+
+    if (!deletedUser) {
+      return res.status(404).json({ message: "Utilisateur non trouvé" });
+    }
+
+    res.status(200).json({ message: "Utilisateur supprimé avec succès" });
+  } catch (err) {
+    console.error("Erreur lors de la suppression :", err);
+    res.status(500).json({ message: "Erreur serveur" });
+  }
+});
+
 // Route d'authentification avec le code généré
 app.post("/login-code", async (req, res) => {
   try {
@@ -135,31 +259,8 @@ app.post("/login-code", async (req, res) => {
   }
 });
 
-// Configuration du port série pour lire les données du keypad
-const portPath = "COM4"; // Remplacez 'COM4' par le port série de votre Arduino
-if (!portPath) {
-  console.error("Le chemin du port série n'est pas défini");
-  process.exit(1);
-}
-
-const port = new SerialPort({ path: portPath, baudRate: 9600 });
-const parser = port.pipe(new ReadlineParser({ delimiter: "\r\n" }));
-
-port.on("open", () => {
-  console.log("Port série ouvert:", portPath);
-});
-
-port.on("error", (err) => {
-  console.error("Erreur de connexion au port série:", err);
-});
-
-parser.on("data", (data) => {
-  console.log("Données du keypad reçues:", data);
-  // Envoyer les données du keypad à tous les clients connectés
-  io.emit("keypad-input", data);
-});
-
 // Démarrage du serveur
-server.listen(3000, () => {
-  console.log("Serveur démarré sur le port 3000");
+const port = process.env.PORT || 3000;
+server.listen(port, () => {
+  console.log(`Le serveur écoute sur le port ${port}`);
 });

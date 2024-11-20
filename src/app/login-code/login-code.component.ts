@@ -65,7 +65,7 @@ export class LoginCodeComponent implements OnInit {
           if (role === 'admin') {
             this.router.navigate(['/dashboard']);
           } else {
-            this.router.navigate(['/dashboard-user']);
+            this.router.navigate(['/dashboard-simple']);
           }
         } else {
           this.errorMessage = 'Erreur lors de la connexion';

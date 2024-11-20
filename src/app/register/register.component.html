@@ -1,43 +1,138 @@
-<form (ngSubmit)="onRegister()">
-  <input
-    type="text"
-    [(ngModel)]="user.nom"
-    name="nom"
-    placeholder="Nom"
-    required
-  />
-  <input
-    type="text"
-    [(ngModel)]="user.prenom"
-    name="prenom"
-    placeholder="Prénom"
-    required
-  />
-  <input
-    type="email"
-    [(ngModel)]="user.email"
-    name="email"
-    placeholder="Email"
-    required
-  />
-  <input
-    type="text"
-    [(ngModel)]="user.numero_tel"
-    name="numero_tel"
-    placeholder="Numéro de téléphone"
-    required
-  />
-  <input
-    type="password"
-    [(ngModel)]="user.mot_de_passe"
-    name="mot_de_passe"
-    placeholder="Mot de passe"
-    required
-  />
-  <select [(ngModel)]="user.role" name="role" required>
-    <option value="admin">Admin</option>
-    <option value="user">User</option>
-  </select>
-  <button type="submit">S'inscrire</button>
-  <div *ngIf="errorMessage">{{ errorMessage }}</div>
-</form>
+<app-sidebar>
+</app-sidebar>
+
+
+
+  <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container-fluid">
+      <div class="profile-container">
+        <span class="dark-mode-toggle" title="Basculer mode sombre/clair">
+          <i class="fas fa-moon"></i>
+        </span>
+        <img src="/images/avatar.png" alt="Profil" class="profile-icon me-2" />
+        <span class="navbar-text">Mouhamadou Lamine Niassy</span>
+      </div>
+    </div>
+  </nav>
+
+<div class="container">
+    <form id="step1" class="form-step active" (ngSubmit)="onRegister()">
+        <h2>Ajout d'un utilisateur</h2>
+        <h3>Informations personnelles</h3>
+        
+        <label for="nom">Nom</label>
+        <input
+            type="text"
+            id="nom"
+            [(ngModel)]="user.nom"
+            name="nom"
+            placeholder="Saisir votre nom"
+            required
+            [ngClass]="{'invalid': !nomValid && nomTouched}"
+            (ngModelChange)="validateNom()"
+            (blur)="nomTouched = true"
+        />
+        <div *ngIf="!nomValid && nomTouched" class="error-message">Le nom doit commencer par une majuscule et ne pas contenir de chiffres ni de caractères spéciaux.</div>
+
+        <label for="prenom">Prénom</label>
+        <input
+            type="text"
+            id="prenom"
+            [(ngModel)]="user.prenom"
+            name="prenom"
+            placeholder="Saisir votre prénom"
+            required
+            [ngClass]="{'invalid': !prenomValid && prenomTouched}"
+            (ngModelChange)="validatePrenom()"
+            (blur)="prenomTouched = true"
+        />
+        <div *ngIf="!prenomValid && prenomTouched" class="error-message">Le prénom doit commencer par une majuscule et peut contenir jusqu'à trois prénoms séparés par des espaces.</div>
+
+        <label for="email">Email</label>
+        <input
+            type="email"
+            id="email"
+            [(ngModel)]="user.email"
+            name="email"
+            placeholder="Saisir votre adresse mail"
+            required
+            [ngClass]="{'invalid': !emailValid && emailTouched}"
+            (ngModelChange)="validateEmail()"
+            (blur)="emailTouched = true"
+        />
+        <div *ngIf="!emailValid && emailTouched" class="error-message">Veuillez saisir un email valide.</div>
+
+        <label for="telephone">Téléphone</label>
+        <input
+            type="tel"
+            id="telephone"
+            [(ngModel)]="user.numero_tel"
+            name="numero_tel"
+            placeholder="Saisir votre numéro de téléphone"
+            required
+            [ngClass]="{'invalid': !telValid && telTouched}"
+            (ngModelChange)="validateTel()"
+            (blur)="telTouched = true"
+        />
+        <div *ngIf="!telValid && telTouched" class="error-message">Le numéro de téléphone doit être valide.</div>
+
+        <div class="buttons">
+            <button type="button" class="btn" id="next1" [disabled]="!isStep1Valid()">Suivant ></button>
+            <button type="reset" class="btn cancel">Annuler</button>
+        </div>
+    </form>
+
+    <!-- Étape 2 : Informations de compte -->
+    <form id="step2" class="form-step" (ngSubmit)="onRegister()">
+        <h2>Ajout d'un utilisateur</h2>
+        <h3>Informations de compte</h3>
+
+        <label for="password">Mot de passe</label>
+        <input
+            type="password"
+            id="password"
+            [(ngModel)]="user.mot_de_passe"
+            name="mot_de_passe"
+            placeholder="Saisir un mot de passe"
+            required
+            [ngClass]="{'invalid': !motDePasseValid && motDePasseTouched}"
+            (ngModelChange)="validateMotDePasse()"
+            (blur)="motDePasseTouched = true"
+        />
+        <div *ngIf="motDePasseTouched">
+            <div class="password-strength-bars">
+              <div *ngFor="let bar of passwordStrengthBars" [ngClass]="bar" class="strength-bar"></div>
+            </div>
+            <div class="password-strength-text">{{ passwordStrengthText }}</div>
+          </div>
+          
+        <label for="role">Rôle</label>
+        <select
+            id="role"
+            [(ngModel)]="user.role"
+            name="role"
+            required
+            [ngClass]="{'invalid': !roleValid && roleTouched}"
+            (ngModelChange)="validateRole()"
+            (blur)="roleTouched = true"
+        >
+            <option value="">Sélectionnez un rôle</option>
+            <option value="admin">admin</option>
+            <option value="user">user</option>
+        </select>
+        <div *ngIf="!roleValid && roleTouched" class="error-message">Le rôle est obligatoire.</div>
+
+        <label for="photo">Photo</label>
+        <input
+            type="file"
+            id="photo"
+            (change)="onFileChange($event)"
+            accept="image/*"
+        />
+
+        <div class="buttons">
+            <button type="button" class="btn" id="prev2" [disabled]="!isStep2Valid()">Précédent</button>
+            <button type="submit" class="btn" [disabled]="!isStep1Valid()">Enregistrer</button>
+        </div>
+    </form>
+</div>
