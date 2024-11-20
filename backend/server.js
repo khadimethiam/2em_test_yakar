@@ -11,6 +11,8 @@ const fs = require("fs");
 
 const app = express();
 const server = http.createServer(app);
+const invalidatedTokens = new Set();
+
 
 // Vérification et création du répertoire 'uploads' si nécessaire
 const uploadDir = path.join(__dirname, "uploads");
@@ -67,6 +69,11 @@ const authMiddleware = (req, res, next) => {
     return res.status(401).json({ message: "Vous devez vous connecter d'abord" });
   }
 
+  // Vérifiez si le token est invalidé
+  if (invalidatedTokens.has(token)) {
+    return res.status(403).json({ message: "Token expiré ou invalidé" });
+  }
+
   try {
     const decoded = jwt.verify(token, "secret_key");
     req.user = decoded; // Ajoute les informations de l'utilisateur à la requête
@@ -75,6 +82,7 @@ const authMiddleware = (req, res, next) => {
     return res.status(403).json({ message: "Token invalide ou expiré" });
   }
 };
+
 
 // Middleware pour vérifier le rôle d'administrateur
 const adminMiddleware = (req, res, next) => {
@@ -155,11 +163,17 @@ app.post("/login", async (req, res) => {
 });
 
 // 3. Déconnexion
-app.post("/logout", (req, res) => {
-  res.clearCookie('token'); // Effacer le cookie 'token'
-  // Supprimez le token côté client
+app.post("/logout", authMiddleware, (req, res) => {
+  const token = req.headers.authorization?.split(" ")[1];
+
+  if (token) {
+    // Ajoutez le token à la liste des tokens invalidés
+    invalidatedTokens.add(token);
+  }
+
   res.status(200).json({ message: "Déconnexion réussie" });
 });
+
 
 // 4. Liste des utilisateurs (Accessible uniquement aux administrateurs)
 app.get("/users", authMiddleware, adminMiddleware, async (req, res) => {
@@ -256,6 +270,29 @@ app.post("/login-code", async (req, res) => {
     res
       .status(500)
       .json({ message: "Erreur lors de l'authentification avec le code" });
+  }
+});
+
+// 8. Changer le rôle d'un utilisateur (Accessible uniquement aux administrateurs)
+app.put("/users/:id/role", authMiddleware, adminMiddleware, async (req, res) => {
+  try {
+    const id = req.params.id;
+    const { role } = req.body; // Le rôle à assigner à l'utilisateur
+
+    if (!["admin", "user"].includes(role)) {
+      return res.status(400).json({ message: "Rôle invalide" });
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(id, { role }, { new: true });
+
+    if (!updatedUser) {
+      return res.status(404).json({ message: "Utilisateur non trouvé" });
+    }
+
+    res.status(200).json({ message: "Rôle mis à jour avec succès", user: updatedUser });
+  } catch (err) {
+    console.error("Erreur lors de la mise à jour du rôle :", err);
+    res.status(500).json({ message: "Erreur serveur" });
   }
 });
 

@@ -200,3 +200,11 @@
 .toggle-switch.active .toggle-knob {
   transform: translateX(26px);
 }
+
+.fas.fa-toggle-on {
+  color: #28a745; /* Vert pour l'état On */
+}
+
+.fas.fa-toggle-off {
+  color: #dc3545; /* Rouge pour l'état Off */
+}

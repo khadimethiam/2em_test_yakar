@@ -94,15 +94,19 @@
   margin-right: 15px;
 }
 
+
+/* Dégradé de couleurs pour les cards */
+.card.primary-white {
+  background: linear-gradient(135deg, #ededf6); /* Pink + Primary Pink */
+  border: none;
+  box-shadow: 0 0 10px 5px #8bb3f8;
+}
+
 /* Dégradé de couleurs pour les cards */
 .card.primary-blue {
-  background: linear-gradient(
-    135deg,
-    #e17cfd,
-    #8bb3f8,
-    #ff69b4
-  ); /* Bleu + Primary Blue */
+  background: linear-gradient(135deg, #ededf6); /* Pink + Primary Pink */
   border: none;
+  box-shadow: 0 0 10px 5px #8bb3f8;
 }
 
 .card.primary-pink {
@@ -199,4 +203,114 @@
 
 .toggle-switch.active .toggle-knob {
   transform: translateX(26px);
+}
+
+.primary-pink {
+  background-image: url('/images/matin.jpg'); /* Remplacez par le chemin de votre image */
+  background-size: cover; /* Pour que l'image couvre toute la carte */
+  background-position: center; /* Pour centrer l'image */
+  background-repeat: no-repeat; /* Évite que l'image se répète */
+  border-radius: 10px; /* Optionnel : ajoute un effet arrondi */
+  color: #fff; /* Ajuste le texte pour qu'il soit lisible */
+  padding: 20px; /* Optionnel : espace intérieur */
+}
+
+.primary-purple {
+  background-image: url('/images/midi.jpg'); /* Remplacez par le chemin de votre image */
+  background-size: cover; /* Pour que l'image couvre toute la carte */
+  background-position: center; /* Pour centrer l'image */
+  background-repeat: no-repeat; /* Évite que l'image se répète */
+  border-radius: 10px; /* Optionnel : ajoute un effet arrondi */
+  color: #fff; /* Ajuste le texte pour qu'il soit lisible */
+  padding: 20px; /* Optionnel : espace intérieur */
+}
+
+.primary-blue {
+  background-image: url('/images/soir.jpg'); /* Remplacez par le chemin de votre image */
+  background-size: cover; /* Pour que l'image couvre toute la carte */
+  background-position: center; /* Pour centrer l'image */
+  background-repeat: no-repeat; /* Évite que l'image se répète */
+  border-radius: 10px; /* Optionnel : ajoute un effet arrondi */
+  color: #fff; /* Ajuste le texte pour qu'il soit lisible */
+  padding: 20px; /* Optionnel : espace intérieur */
+}
+
+.temperature-icon {
+  width: 50px;
+  height: 50px;
+  margin-right: 10px;
+}
+
+
+
+
+.cold-bg {
+  background-image: url('/assets/images/cold.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  border-radius: 10px;
+  color: #fff;
+  padding: 20px;
+}
+
+.moderate-bg {
+  background-image: url('/assets/images/moderate.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  border-radius: 10px;
+  color: #fff;
+  padding: 20px;
+}
+
+.hot-bg {
+  background-image: url('/assets/images/hot.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  border-radius: 10px;
+  color: #fff;
+  padding: 20px;
+}
+
+.default {
+  background-color: #f5f5f5; /* Fond neutre par défaut */
+  color: #000;
+}
+
+.fixed-background {
+  background-image: url('/images/moyenne.png'); /* Remplacez par le chemin de votre image */
+  background-size: cover; /* Pour couvrir tout le conteneur */
+  background-position: center; /* Centrer l'image */
+  background-repeat: no-repeat; /* Éviter la répétition de l'image */
+  border-radius: 10px; /* Bords arrondis */
+  color: #fff; /* Couleur de texte adaptée */
+  padding: 20px; /* Ajoute un espace intérieur */
+}
+
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between; /* Espace entre les sections */
+  height: 100vh; /* Hauteur complète de la page */
+  padding: 20px; /* Espacement intérieur */
+  background-color: #f8f9fa; /* Exemple de fond */
+}
+
+.toggle-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.logout {
+  text-align: center;
+  margin-top: 10px;
+  color: #333; /* Couleur du texte */
+  text-decoration: none; /* Supprimer le soulignement */
+}
+
+.logout:hover {
+  color: #007bff; /* Changement de couleur au survol */
 }

@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { SidebarComponent } from '../sidebar/sidebar.component';
 import { Chart } from 'chart.js';
+import { CommonModule } from '@angular/common'; // Importer CommonModule i
 
 
 @Component({
@@ -9,7 +10,7 @@ import { Chart } from 'chart.js';
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css'],
   standalone: true,
-  imports: [SidebarComponent],
+  imports: [SidebarComponent,CommonModule],
 })
 export class DashboardComponent implements OnInit {
   // Variables pour l'humidité
@@ -24,6 +25,7 @@ export class DashboardComponent implements OnInit {
 
   // Variables pour la température
   temperature: string = '--°C';
+  temperatureClass: string = ''; // Variable pour l'image de température
   temperature_moy: string = '--°C';
   temperature_mat: string = '--°C';
   temperature_midi: string = '--°C';
@@ -51,6 +53,7 @@ export class DashboardComponent implements OnInit {
   averageHumidities: number[] = [];
   days: string[] = [ 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi','Dimanche'];
 
+ 
   constructor(private http: HttpClient) {}
 
   ngOnInit(): void {
@@ -64,7 +67,10 @@ export class DashboardComponent implements OnInit {
   }, 3600000);
       await this.getHumidity();
       await this.getTemperature();
-    }, 120000); // Actualisation toutes les 2 minutes
+      this.updateTemperatureClass(); // Mettre à jour l'image après avoir récupéré la température
+    }, 120000);
+    // Actualisation toutes les 2 minutes
+
   }
 
 
@@ -262,6 +268,20 @@ export class DashboardComponent implements OnInit {
       console.error("Erreur lors de la récupération de la température", error);
     }
   }
+
+
+  updateTemperatureClass() {
+    const tempValue = parseFloat(this.temperature.replace('°C', ''));
+
+    if (tempValue < 15) {
+      this.temperatureClass = 'cold-bg'; // Froid
+    } else if (tempValue >= 15 && tempValue < 25) {
+      this.temperatureClass = 'moderate-bg'; // Modéré
+    } else {
+      this.temperatureClass = 'hot-bg'; // Chaud
+    }
+  }
+
 
   async getMorningDataForSpecificTime() {
     try {

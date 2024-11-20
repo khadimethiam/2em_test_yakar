@@ -38,12 +38,12 @@ function getDayOfWeek() {
 
 const Historique = mongoose.model('Historique', historiqueSchema);
 
-const arduinoPort = new SerialPort({
+/*const arduinoPort = new SerialPort({
   path: '/dev/ttyUSB0',
   baudRate: 9600,
-});
+});*/
 
-const parser = arduinoPort.pipe(new ReadlineParser({ delimiter: '\n' }));
+/*const parser = arduinoPort.pipe(new ReadlineParser({ delimiter: '\n' }));*/
 
 let sensorData = { temperature: null, humidity: null };
 
@@ -55,7 +55,7 @@ function getCurrentTime() {
   return `${hours}:${minutes}:${seconds}`;
 }
 
-parser.on('data', (data) => {
+/*parser.on('data', (data) => {
   try {
     const parsedData = JSON.parse(data.trim());
     sensorData = {
@@ -66,7 +66,7 @@ parser.on('data', (data) => {
   } catch (error) {
     console.error('Erreur lors du parsing des données Arduino:', error.message);
   }
-});
+});*/
 
 async function saveDataToDB(hour) {
   const currentDay = getDayOfWeek();
