@@ -6,6 +6,7 @@ const mongoose = require('mongoose');
 const axios = require('axios');
 
 const app = express();
+
 const port = 3002; // Port de l'API
 
 app.use(cors());
@@ -30,20 +31,30 @@ const historiqueSchema = new mongoose.Schema({
   jour: String,
 });
 
+const Historique = mongoose.model('Historique', historiqueSchema);
+
+// Modèle pour stocker les moyennes quotidiennes
+const dailyAverageSchema = new mongoose.Schema({
+  averageTemperature: Number,
+  averageHumidity: Number,
+  date: { type: Date, default: Date.now },
+  jour: String,
+});
+
+const DailyAverage = mongoose.model('DailyAverage', dailyAverageSchema);
+
 function getDayOfWeek() {
   const now = new Date();
   const days = ["Dimanche", "Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi"];
   return days[now.getDay()];
 }
 
-const Historique = mongoose.model('Historique', historiqueSchema);
-
-/*const arduinoPort = new SerialPort({
+const arduinoPort = new SerialPort({
   path: '/dev/ttyUSB0',
   baudRate: 9600,
-});*/
+});
 
-/*const parser = arduinoPort.pipe(new ReadlineParser({ delimiter: '\n' }));*/
+const parser = arduinoPort.pipe(new ReadlineParser({ delimiter: '\n' }));
 
 let sensorData = { temperature: null, humidity: null };
 
@@ -55,7 +66,7 @@ function getCurrentTime() {
   return `${hours}:${minutes}:${seconds}`;
 }
 
-/*parser.on('data', (data) => {
+parser.on('data', (data) => {
   try {
     const parsedData = JSON.parse(data.trim());
     sensorData = {
@@ -66,7 +77,7 @@ function getCurrentTime() {
   } catch (error) {
     console.error('Erreur lors du parsing des données Arduino:', error.message);
   }
-});*/
+});
 
 async function saveDataToDB(hour) {
   const currentDay = getDayOfWeek();
@@ -88,9 +99,9 @@ async function saveDataToDB(hour) {
 
 // Heures spécifiques à surveiller
 let dataForSpecificHours = {
-  '17h16': { temperature: null, humidity: null },
-  '17h17': { temperature: null, humidity: null },
-  '17h18': { temperature: null, humidity: null },
+  '12h10': { temperature: null, humidity: null },
+  '12h11': { temperature: null, humidity: null },
+  '12h12': { temperature: null, humidity: null },
 };
 
 function checkAndSaveData() {
@@ -116,6 +127,44 @@ function checkAndSaveData() {
 
 setInterval(checkAndSaveData, 60000);
 
+// Fonction pour calculer et enregistrer les moyennes de température et d'humidité
+async function calculateAndSaveDailyAverages() {
+  try {
+    const currentDay = getDayOfWeek();
+
+    // Récupérer toutes les données pour le jour courant
+    const dailyData = await Historique.find({ jour: currentDay });
+
+    if (dailyData.length > 0) {
+      // Calculer les moyennes de température et d'humidité
+      const totalTemperature = dailyData.reduce((acc, data) => acc + data.temperature, 0);
+      const totalHumidity = dailyData.reduce((acc, data) => acc + data.humidity, 0);
+      const averageTemperature = totalTemperature / dailyData.length;
+      const averageHumidity = totalHumidity / dailyData.length;
+
+      // Sauvegarder les moyennes dans la base de données
+      const dailyAverage = new DailyAverage({
+        averageTemperature,
+        averageHumidity,
+        jour: currentDay,
+      });
+
+      await dailyAverage.save();
+      console.log(`Moyenne enregistrée pour ${currentDay}: Température = ${averageTemperature}, Humidité = ${averageHumidity}`);
+    }
+  } catch (error) {
+    console.error('Erreur lors du calcul et de l\'enregistrement des moyennes:', error);
+  }
+}
+
+// Planification du calcul et de l'enregistrement des moyennes 5 minutes après la dernière heure de collecte (12h05)
+setInterval(() => {
+  const now = new Date();
+  if (now.getHours() === 12 && now.getMinutes() === 15) {
+    calculateAndSaveDailyAverages();
+  }
+}, 60000);
+
 app.post('/api/data/save', async (req, res) => {
   const { temperature, humidity, hour } = req.body;
   if (temperature !== null && humidity !== null && hour) {
@@ -126,23 +175,21 @@ app.post('/api/data/save', async (req, res) => {
   }
 });
 
-const specificHoursRoutes = ['17h16', '17h17', '17h18'];
+const specificHoursRoutes = ['12h10', '12h11', '12h12'];
 
 specificHoursRoutes.forEach((hour) => {
   app.get(`/api/data/${hour}`, async (req, res) => {
     try {
-      // Obtenir la date actuelle
       const today = new Date();
-      const startOfDay = new Date(today.setHours(0, 0, 0, 0)); // Début du jour actuel
-      const endOfDay = new Date(today.setHours(23, 59, 59, 999)); // Fin du jour actuel
+      const startOfDay = new Date(today.setHours(0, 0, 0, 0));
+      const endOfDay = new Date(today.setHours(23, 59, 59, 999));
 
-      // Rechercher des données pour l'heure spécifiée et la date actuelle
       const data = await Historique.find({
         hour,
-        date: { $gte: startOfDay, $lte: endOfDay }, // Filtrer entre début et fin du jour
+        date: { $gte: startOfDay, $lte: endOfDay },
       })
-        .sort({ date: -1 }) // Trier par date décroissante
-        .limit(1); // Limiter à une donnée
+        .sort({ date: -1 })
+        .limit(1);
 
       if (data.length > 0) {
         res.json({
@@ -161,6 +208,40 @@ specificHoursRoutes.forEach((hour) => {
   });
 });
 
+app.get('/api/data/weekly', async (req, res) => {
+  try {
+    const startOfWeek = new Date();
+    startOfWeek.setDate(startOfWeek.getDate() - startOfWeek.getDay());
+    startOfWeek.setHours(0, 0, 0, 0);
+
+    const endOfWeek = new Date();
+    endOfWeek.setDate(startOfWeek.getDate() + 6);
+    endOfWeek.setHours(23, 59, 59, 999);
+
+    const data = await Historique.aggregate([
+      {
+        $match: {
+          date: { $gte: startOfWeek, $lte: endOfWeek },
+        },
+      },
+      {
+        $group: {
+          _id: "$jour",
+          temperatures: { $push: "$temperature" },
+          humidities: { $push: "$humidity" },
+          averageTemperature: { $avg: "$temperature" },
+          averageHumidity: { $avg: "$humidity" },
+        },
+      },
+      { $sort: { _id: 1 } },
+    ]);
+
+    res.json(data);
+  } catch (error) {
+    console.error('Erreur lors de la récupération des données hebdomadaires :', error);
+    res.status(500).json({ message: 'Erreur serveur' });
+  }
+});
 
 // Routes pour obtenir les données de température et d'humidité
 app.get('/api/data/humidity', (req, res) => {
@@ -179,47 +260,30 @@ app.get('/api/data/temperature', (req, res) => {
   }
 });
 
-app.listen(port, () => {
-  console.log(`Server running on http://localhost:${port}`);
-});
 
-
-
-app.get('/api/data/weekly', async (req, res) => {
+app.get('/api/data/daily-averages', async (req, res) => {
   try {
-    // Déterminer le début et la fin de la semaine actuelle
-    const startOfWeek = new Date();
-    startOfWeek.setDate(startOfWeek.getDate() - startOfWeek.getDay()); // Dimanche
-    startOfWeek.setHours(0, 0, 0, 0);
+    const today = new Date();
+    const currentDay = today.getDay();  // Jour de la semaine (0-6, 0=dimanche, 6=samedi)
+    const dailyAverage = await DailyAverage.findOne({ jour: getDayOfWeek() }).sort({ date: -1 }).limit(1);
 
-    const endOfWeek = new Date();
-    endOfWeek.setDate(startOfWeek.getDate() + 6); // Samedi
-    endOfWeek.setHours(23, 59, 59, 999);
-
-    // Récupérer les données hebdomadaires
-    const data = await Historique.aggregate([
-      {
-        $match: {
-          date: { $gte: startOfWeek, $lte: endOfWeek },
-        },
-      },
-      {
-        $group: {
-          _id: "$jour", // Grouper par jour
-          temperatures: { $push: "$temperature" },
-          humidities: { $push: "$humidity" },
-          averageTemperature: { $avg: "$temperature" },
-          averageHumidity: { $avg: "$humidity" },
-        },
-      },
-      { $sort: { _id: 1 } }, // Trier par ordre des jours
-    ]);
-
-    res.json(data);
+    if (dailyAverage) {
+      res.json({
+        date: today.toLocaleDateString(),
+        averageTemperature: dailyAverage.averageTemperature,
+        averageHumidity: dailyAverage.averageHumidity,
+      });
+    } else {
+      res.status(404).json({ message: "Aucune donnée moyenne trouvée pour aujourd'hui." });
+    }
   } catch (error) {
-    console.error('Erreur lors de la récupération des données hebdomadaires :', error);
+    console.error('Erreur lors de la récupération des moyennes quotidiennes:', error);
     res.status(500).json({ message: 'Erreur serveur' });
   }
 });
 
 
+
+app.listen(port, () => {
+  console.log(`Server running on http://localhost:${port}`);
+});

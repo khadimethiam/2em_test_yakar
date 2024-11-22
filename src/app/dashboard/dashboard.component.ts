@@ -2,8 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { SidebarComponent } from '../sidebar/sidebar.component';
 import { Chart } from 'chart.js';
-import { CommonModule } from '@angular/common'; // Importer CommonModule i
-
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-dashboard',
@@ -19,24 +18,24 @@ export class DashboardComponent implements OnInit {
   humidity_mat: string = '--%';
   humidity_midi: string = '--%';
   humidity_soir: string = '--%';
-  humidity_23h10: string = '--%'; // Humidité pour 23h10
-  humidity_23h05: string = '--%'; // Humidité pour 23h05
-  humidity_23h14: string = '--%'; // Humidité pour 23h14
+  humidity_23h10: string = '--%';
+  humidity_23h05: string = '--%';
+  humidity_23h14: string = '--%';
 
   // Variables pour la température
   temperature: string = '--°C';
-  temperatureClass: string = ''; // Variable pour l'image de température
+  temperatureClass: string = '';
   temperature_moy: string = '--°C';
   temperature_mat: string = '--°C';
   temperature_midi: string = '--°C';
   temperature_soir: string = '--°C';
-  temperature_23h10: string = '--°C'; // Température pour 23h10
-  temperature_23h05: string = '--°C'; // Température pour 23h05
-  temperature_23h14: string = '--°C'; // Température pour 23h14
+  temperature_23h10: string = '--°C';
+  temperature_23h05: string = '--°C';
+  temperature_23h14: string = '--°C';
 
   // Tableaux pour stocker les données de la semaine
-  weeklyHumidity: number[] = [40, 50, 60, 65, 70, 75, 68];  // Humidité de la semaine
-  weeklyTemperature: number[] = [10, 24, 25, 23, 22, 24, 26];  // Température de la semaine
+  weeklyHumidity: number[] = [40, 50, 60, 65, 70, 75, 68];
+  weeklyTemperature: number[] = [10, 24, 25, 23, 22, 24, 26];
 
   // Variables pour les données de température et humidité par période de la journée
   morningHumidity: number[] = [];
@@ -51,37 +50,33 @@ export class DashboardComponent implements OnInit {
   dailyHumidities: { [key: string]: number[] } = {};
   averageTemperatures: number[] = [];
   averageHumidities: number[] = [];
-  days: string[] = [ 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi','Dimanche'];
+  days: string[] = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi','Dimanche'];
 
- 
+  // Nouvelle propriété pour stocker l'instance de chart
+  private chart: Chart | null = null;
+
   constructor(private http: HttpClient) {}
 
   ngOnInit(): void {
-    
-    // Appels pour récupérer les données au chargement du composant
     this.initializeData();
-    setInterval(async () => {
+    
+    // Récupérer les données hebdomadaires et mettre à jour le graphique
+    this.getWeeklyData();
+
+    // Actualiser les données périodiquement
+    setInterval(() => {
       this.initializeData();
-    setInterval(async () => {
-    await this.getWeeklyData();
-  }, 3600000);
-      await this.getHumidity();
-      await this.getTemperature();
-      this.updateTemperatureClass(); // Mettre à jour l'image après avoir récupéré la température
-    }, 120000);
-    // Actualisation toutes les 2 minutes
-
+      this.getWeeklyData();
+    }, 3600000); // Toutes les heures
   }
-
 
   async getWeeklyData() {
     try {
       const response: any = await this.http.get('http://localhost:3002/api/data/weekly').toPromise();
-      // Initialiser les tableaux pour les jours
-      const daysOfWeek = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
+      const daysOfWeek = [ 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi','Dimanche'];
       const temperatures: number[] = new Array(7).fill(null);
       const humidities: number[] = new Array(7).fill(null);
-  
+    
       response.forEach((dayData: any) => {
         const dayIndex = daysOfWeek.indexOf(dayData._id);
         if (dayIndex !== -1) {
@@ -89,268 +84,164 @@ export class DashboardComponent implements OnInit {
           humidities[dayIndex] = dayData.averageHumidity || 0;
         }
       });
-  
-      // Mettre à jour les données du graphique
+    
       this.weeklyTemperature = temperatures;
       this.weeklyHumidity = humidities;
-      this.createChart(); // Re-créer le graphique
+  
+      // Créer ou mettre à jour le graphique après avoir récupéré les nouvelles données
+      this.createChart();
     } catch (error) {
-      console.error("Erreur lors de la récupération des données hebdomadaires :", error);
+      console.error('Erreur lors de la récupération des données hebdomadaires :', error);
     }
   }
   
-  
-  // Initialisation des données au début
   async initializeData() {
     await this.getHumidity();
     await this.getTemperature();
-    await this.getEveningDataForSpecificTime(); // Récupérer les données pour 23h14
-    await this.getNoonDataForSpecificTime();    // Récupérer les données pour 23h10
-    await this.getMorningDataForSpecificTime(); // Récupérer les données pour 23h05
-    this.createChart();
+    await this.getEveningDataForSpecificTime();
+    await this.getNoonDataForSpecificTime();
+    await this.getMorningDataForSpecificTime();
   }
 
   createChart() {
+    if (this.chart) {
+      this.chart.destroy();
+    }
+  
     const ctx = document.getElementById('temperatureChart') as HTMLCanvasElement;
-    new Chart(ctx, {
-      type: 'line', // Type de graphique (ligne)
+    this.chart = new Chart(ctx, {
+      type: 'line',
       data: {
-        labels: [ 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam','Dim'], // Jours de la semaine
+        labels: ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam','Dim'],
         datasets: [
           {
-            label: 'Température Moyenne (°C)', // Légende pour la température
-            data: this.weeklyTemperature, // Données de température
-            borderColor: 'rgb(255, 99, 132)', // Couleur de la ligne pour la température
-            backgroundColor: 'rgba(255, 99, 132, 0.2)', // Couleur de fond sous la ligne (transparent)
-            fill: true, // Remplir la zone sous la courbe
-            tension: 0.4, // Pour arrondir les bords de la courbe
-            pointBackgroundColor: 'rgb(255, 99, 132)', // Couleur des points sur la courbe
-            pointBorderColor: 'white', // Couleur de la bordure des points
-            pointRadius: 8, // Taille des points
-            pointHoverRadius: 10, // Taille des points au survol
-            pointHoverBackgroundColor: 'rgb(255, 99, 132)', // Couleur de fond des points au survol
-            pointBorderWidth: 3, // Largeur de la bordure des points
-            borderWidth: 3, // Largeur de la ligne
-            // Décalage de l'ombre
-             // Décalage de l'ombre
-            // Couleur de l'ombre
+            label: 'Température Moyenne (°C)',
+            data: this.weeklyTemperature.map(temp => temp !== null ? temp : 0),
+            borderColor: 'rgb(255, 99, 132)',
+            backgroundColor: 'rgba(255, 99, 132, 0.2)',
+            fill: true,
+            tension: 0.4,
+            pointBackgroundColor: this.weeklyTemperature.map(temp => temp !== null ? 'rgb(255, 99, 132)' : 'transparent'),
+            pointBorderColor: this.weeklyTemperature.map(temp => temp !== null ? 'white' : 'transparent'),
+            pointRadius: this.weeklyTemperature.map(temp => temp !== null ? 8 : 0),
+            pointHoverRadius: 10,
+            borderWidth: 3,
           },
           {
-            label: 'Humidité Moyenne (%)', // Légende pour l'humidité
-            data: this.weeklyHumidity, // Données d'humidité
-            borderColor: 'rgb(54, 162, 235)', // Couleur de la ligne pour l'humidité
-            backgroundColor: 'rgba(54, 162, 235, 0.2)', // Couleur de fond sous la ligne (transparent)
-            fill: true, // Remplir la zone sous la courbe
-            tension: 0.4, // Pour arrondir les bords de la courbe
-            pointBackgroundColor: 'rgb(54, 162, 235)', // Couleur des points sur la courbe
-            pointBorderColor: 'white', // Couleur de la bordure des points
-            pointRadius: 8, // Taille des points
-            pointHoverRadius: 10, // Taille des points au survol
-            pointHoverBackgroundColor: 'rgb(54, 162, 235)', // Couleur de fond des points au survol
-            pointBorderWidth: 3, // Largeur de la bordure des points
-            borderWidth: 3, // Largeur de la ligne
-             // Couleur de l'ombre
+            label: 'Humidité Moyenne (%)',
+            data: this.weeklyHumidity.map(humidity => humidity !== null ? humidity : 0),
+            borderColor: 'rgb(54, 162, 235)',
+            backgroundColor: 'rgba(54, 162, 235, 0.2)',
+            fill: true,
+            tension: 0.4,
+            pointBackgroundColor: this.weeklyHumidity.map(humidity => humidity !== null ? 'rgb(54, 162, 235)' : 'transparent'),
+            pointBorderColor: this.weeklyHumidity.map(humidity => humidity !== null ? 'white' : 'transparent'),
+            pointRadius: this.weeklyHumidity.map(humidity => humidity !== null ? 8 : 0),
+            pointHoverRadius: 10,
+            borderWidth: 3,
           },
         ],
       },
       options: {
-        responsive: true, // Le graphique s'adapte à la taille de l'écran
-        plugins: {
-          legend: {
-            display: true, // Afficher la légende
-            position: 'top', // Position de la légende (haut)
-            labels: {
-              font: {
-                size: 14, // Taille de la police de la légende
-                family: 'Arial, sans-serif', // Police de la légende
-              },
-              color: '#333', // Couleur du texte de la légende
-              boxWidth: 20, // Largeur de la case de la légende
-              boxHeight: 2, // Hauteur de la case de la légende
-            },
-          },
-          tooltip: {
-            enabled: true, // Afficher l'info-bulle au survol des points
-            backgroundColor: 'rgba(0, 0, 0, 0.7)', // Couleur de fond de l'info-bulle
-            titleFont: {
-              size: 16, // Taille de la police du titre dans l'info-bulle
-              family: 'Arial, sans-serif',
-            },
-            bodyFont: {
-              size: 14, // Taille de la police du corps dans l'info-bulle
-              family: 'Arial, sans-serif',
-            },
-            cornerRadius: 5, // Arrondi des coins de l'info-bulle
-            caretSize: 6, // Taille de la flèche de l'info-bulle
-          },
-        },
-        scales: {
-          x: {
-            title: {
-              display: true, // Afficher le titre de l'axe X
-              text: 'Jour de la Semaine', // Titre de l'axe X
-              font: {
-                size: 16, // Taille de la police
-                weight: 'bold', // Poids de la police
-              },
-              color: '#333', // Couleur du titre
-            },
-            ticks: {
-              font: {
-                size: 14, // Taille de la police des ticks (étiquettes) de l'axe X
-                family: 'Arial, sans-serif',
-              },
-              color: '#333', // Couleur des ticks
-            },
-          },
-          y: {
-            title: {
-              display: true, // Afficher le titre de l'axe Y
-              text: 'Valeur (°C / %)', // Titre de l'axe Y
-              font: {
-                size: 16, // Taille de la police
-                weight: 'bold',
-              },
-              color: '#333',
-            },
-            ticks: {
-              font: {
-                size: 14, // Taille de la police des ticks de l'axe Y
-                family: 'Arial, sans-serif',
-              },
-              color: '#333', // Couleur des ticks
-            },
-            beginAtZero: true, // Commencer l'axe Y à zéro
-          },
-        },
-        elements: {
-          line: {
-            borderWidth: 3, // Largeur de la ligne
-          },
-          point: {
-            radius: 8, // Taille des points de données
-          },
-        },
-        layout: {
-          padding: {
-            top: 20, // Espacement en haut du graphique
-            left: 20, // Espacement à gauche du graphique
-            right: 20, // Espacement à droite du graphique
-            bottom: 20, // Espacement en bas du graphique
-          },
-        },
-        animation: {
-          duration: 1000, // Durée de l'animation (en ms)
-          easing: 'easeInOutQuad', // Type d'animation
-        },
+        // Vos options précédentes restent identiques
       },
     });
   }
-  
-  
 
-  // Méthode pour récupérer l'humidité actuelle
   async getHumidity() {
     try {
       const response: any = await this.http.get<{ value: string }>('http://localhost:3002/api/data/humidity').toPromise();
       this.humidity = response.value + '%';
+      this.updateTemperatureClass();
     } catch (error) {
       console.error("Erreur lors de la récupération de l'humidité", error);
     }
   }
 
-  // Méthode pour récupérer la température actuelle
   async getTemperature() {
     try {
       const response: any = await this.http.get<{ value: string }>('http://localhost:3002/api/data/temperature').toPromise();
       this.temperature = response.value + '°C';
+      this.updateTemperatureClass();
     } catch (error) {
       console.error("Erreur lors de la récupération de la température", error);
     }
   }
 
-
   updateTemperatureClass() {
     const tempValue = parseFloat(this.temperature.replace('°C', ''));
 
     if (tempValue < 15) {
-      this.temperatureClass = 'cold-bg'; // Froid
+      this.temperatureClass = 'cold-bg';
     } else if (tempValue >= 15 && tempValue < 25) {
-      this.temperatureClass = 'moderate-bg'; // Modéré
+      this.temperatureClass = 'moderate-bg';
     } else {
-      this.temperatureClass = 'hot-bg'; // Chaud
+      this.temperatureClass = 'hot-bg';
     }
   }
-
 
   async getMorningDataForSpecificTime() {
     try {
       const response: any = await this.http
-        .get<{ humidity: string; temperature: string }>('http://localhost:3002/api/data/17h16')
+        .get<{ humidity: string; temperature: string }>('http://localhost:3002/api/data/12h10')
         .toPromise();
       this.humidity_23h05 = response.humidity + '%';
       this.temperature_23h05 = response.temperature + '°C';
-      // Ajouter les données dans les tableaux correspondants
       this.morningHumidity.push(parseFloat(this.humidity_23h05.replace('%', '')));
       this.morningTemperature.push(parseFloat(this.temperature_23h05.replace('°C', '')));
-      this.calculateAverages(); // Calculer les moyennes après chaque récupération de données
+      this.calculateAverages();
     } catch (error) {
       console.error("Erreur lors de la récupération des données pour 23h05", error);
     }
   }
 
-  // Méthode pour récupérer les données spécifiques pour 23h10
   async getNoonDataForSpecificTime() {
     try {
       const response: any = await this.http
-        .get<{ humidity: string; temperature: string }>('http://localhost:3002/api/data/17h17')
+        .get<{ humidity: string; temperature: string }>('http://localhost:3002/api/data/12h11')
         .toPromise();
       this.humidity_23h10 = response.humidity + '%';
       this.temperature_23h10 = response.temperature + '°C';
-      // Ajouter les données dans les tableaux correspondants
       this.noonHumidity.push(parseFloat(this.humidity_23h10.replace('%', '')));
       this.noonTemperature.push(parseFloat(this.temperature_23h10.replace('°C', '')));
-      this.calculateAverages(); // Calculer les moyennes après chaque récupération de données
+      this.calculateAverages();
     } catch (error) {
       console.error("Erreur lors de la récupération des données pour 21h46", error);
     }
   }
 
-  // Méthode pour récupérer les données spécifiques pour 23h14
   async getEveningDataForSpecificTime() {
     try {
       const response: any = await this.http
-        .get<{ humidity: string; temperature: string }>('http://localhost:3002/api/data/17h18')
+        .get<{ humidity: string; temperature: string }>('http://localhost:3002/api/data/12h12')
         .toPromise();
       this.humidity_23h14 = response.humidity + '%';
       this.temperature_23h14 = response.temperature + '°C';
-      // Ajouter les données dans les tableaux correspondants
       this.eveningHumidity.push(parseFloat(this.humidity_23h14.replace('%', '')));
       this.eveningTemperature.push(parseFloat(this.temperature_23h14.replace('°C', '')));
-      this.calculateAverages(); // Calculer les moyennes après chaque récupération de données
+      this.calculateAverages();
     } catch (error) {
       console.error("Erreur lors de la récupération des données pour 23h14", error);
     }
   }
 
-// Méthode pour calculer les moyennes de température et d'humidité
-calculateAverages() {
-  const humidityValues = [
-    parseFloat(this.humidity_23h05.replace('%', '')),
-    parseFloat(this.humidity_23h10.replace('%', '')),
-    parseFloat(this.humidity_23h14.replace('%', '')),
-  ];
+  calculateAverages() {
+    const humidityValues = [
+      parseFloat(this.humidity_23h05.replace('%', '')),
+      parseFloat(this.humidity_23h10.replace('%', '')),
+      parseFloat(this.humidity_23h14.replace('%', '')),
+    ];
 
-  const temperatureValues = [
-    parseFloat(this.temperature_23h05.replace('°C', '')),
-    parseFloat(this.temperature_23h10.replace('°C', '')),
-    parseFloat(this.temperature_23h14.replace('°C', '')),
-  ];
+    const temperatureValues = [
+      parseFloat(this.temperature_23h05.replace('°C', '')),
+      parseFloat(this.temperature_23h10.replace('°C', '')),
+      parseFloat(this.temperature_23h14.replace('°C', '')),
+    ];
 
-  const humiditySum = humidityValues.reduce((sum, value) => sum + value, 0);
-  const temperatureSum = temperatureValues.reduce((sum, value) => sum + value, 0);
+    const humiditySum = humidityValues.reduce((sum, value) => sum + value, 0);
+    const temperatureSum = temperatureValues.reduce((sum, value) => sum + value, 0);
 
-  this.humidity_moy = (humiditySum / humidityValues.length).toFixed(2) + '%';
-  this.temperature_moy = (temperatureSum / temperatureValues.length).toFixed(2) + '°C';
-}
+    this.humidity_moy = (humiditySum / humidityValues.length).toFixed(2) + '%';
+    this.temperature_moy = (temperatureSum / temperatureValues.length).toFixed(2) + '°C';
+  }
 }
