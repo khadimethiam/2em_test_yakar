@@ -18,12 +18,14 @@ export class LoginComponent {
 
   constructor(private authService: AuthService, private router: Router) {}
 
+  // Fonction pour traiter la connexion
   onLogin() {
     this.authService.login(this.user).subscribe(
       (res) => {
         if (res.token) {
-          localStorage.setItem('token', res.token);
+          localStorage.setItem('token', res.token);  // Sauvegarde du token
           const role = this.getRoleFromToken(res.token);
+          // Naviguer en fonction du rôle
           if (role === 'admin') {
             this.router.navigate(['/dashboard']);
           } else {
@@ -40,6 +42,7 @@ export class LoginComponent {
     );
   }
 
+  // Fonction pour extraire le rôle à partir du token JWT
   getRoleFromToken(token: string): string {
     const payload = JSON.parse(atob(token.split('.')[1]));
     return payload.role;
