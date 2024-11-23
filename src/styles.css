@@ -1,1 +1,11 @@
 /* You can add global styles to this file, and also import other style files */
+::ng-deep .custom-dialog-backdrop {
+    backdrop-filter: blur(5px); /* Floute l'arrière-plan */
+    background-color: rgba(0, 0, 0, 0.4); /* Optionnel : ajouter un peu de foncé */
+  }
+  
+  ::ng-deep .custom-dialog {
+    border-radius: 10px;
+    text-align: center;
+  }
+  
