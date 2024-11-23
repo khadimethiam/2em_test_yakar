@@ -67,7 +67,7 @@ export class DashboardComponent implements OnInit {
     setInterval(() => {
       this.initializeData();
       this.getWeeklyData();
-    }, 3600000); // Toutes les heures
+    }, 360000); // Toutes les heures
   }
 
   async getWeeklyData() {

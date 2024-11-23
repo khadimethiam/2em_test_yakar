@@ -1,42 +1,35 @@
 import { Component } from '@angular/core';
-import { AuthService } from '../auth.service';
-import { HttpClient } from '@angular/common/http'; // Importer HttpClient pour les requêtes HTTP
-import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';  // Importer RouterModule
 
 @Component({
   selector: 'app-sidebar',
   templateUrl: './sidebar.component.html',
   styleUrls: ['./sidebar.component.css'],
   standalone: true,
-  imports : [CommonModule],
+  imports: [RouterModule]  // Ajouter RouterModule ici
 })
 export class SidebarComponent {
+  toggleState: boolean = false;
 
-  isOn: boolean = false;
+  // Fonction pour basculer l'état du toggle switch
+  toggleSwitch() {
+    this.toggleState = !this.toggleState;
 
-  constructor(private authService: AuthService, private http: HttpClient) {}
+    // Récupérer l'élément toggle-switch et l'élément knob
+    const toggleSwitch = document.getElementById('toggleSwitch') as HTMLElement;
+    const offIcon = document.getElementById('offIcon') as HTMLImageElement;
+    const onIcon = document.getElementById('onIcon') as HTMLImageElement;
 
-  // Méthode pour basculer l'état du ventilateur et envoyer la requête à l'API
-  toggleState(): void {
-    this.isOn = !this.isOn; // Inverser l'état du ventilateur
-
-    // Déterminer l'action à envoyer à l'API
-    const action = this.isOn ? 'on' : 'off';
-
-    // Envoyer une requête POST à l'API pour contrôler l'état du ventilateur
-    this.http.post('http://localhost:3002/api/ventilator', { action }).subscribe(
-      (response) => {
-        console.log('Réponse du serveur:', response);
-      },
-      (error) => {
-        console.error('Erreur lors de la commande:', error);
-        // En cas d'erreur, inverser l'état du ventilateur pour le maintenir synchronisé
-        this.isOn = !this.isOn;
-      }
-    );
-  }
-
-  onLogout() {
-    this.authService.logout();
+    // Changer la classe "active" du toggle switch pour changer la couleur et déplacer le knob
+    toggleSwitch.classList.toggle('active');
+    
+    // Gérer l'opacité des images
+    if (this.toggleState) {
+      offIcon.style.opacity = '0';
+      onIcon.style.opacity = '1';
+    } else {
+      offIcon.style.opacity = '1';
+      onIcon.style.opacity = '0';
+    }
   }
 }

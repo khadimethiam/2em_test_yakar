@@ -1,65 +1,3 @@
-.sidebar {
-  height: 100vh;
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 250px;
-  background-color: #ededf4;
-  color: black;
-  padding-top: 20px;
-  display: flex;
-  flex-direction: column;
-}
-
-.sidebar a {
-  color: black;
-  text-decoration: none;
-  padding: 15px;
-  display: block;
-  transition: background-color 0.3s ease;
-}
-
-.sidebar a:hover {
-  background-color: #8bb3f8;
-}
-
-.sidebar .logout {
-  margin-top: auto;
-  display: flex;
-  align-items: center;
-  padding: 15px;
-  background-color: #ededf4;
-  border-top: 5px solid #8bb3f8;
-  color: black;
-  text-decoration: none;
-}
-
-.sidebar .logout i {
-  margin-right: 10px;
-}
-/* Contenu principal */
-.content {
-  margin-left: 250px;
-  padding: 20px;
-}
-
-/* Header avec profil */
-.navbar {
-  border-bottom: 1px solid #dee2e6;
-  padding: 10px 20px;
-  border-radius: 20px;
-}
-
-.profile-icon {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-}
-
-.navbar-text {
-  font-weight: bold;
-}
-
 /* Cards */
 .card {
   border-radius: 15px;
@@ -86,14 +24,6 @@
   font-weight: bold;
   color: black;
 }
-
-/* Icones */
-.icon-container {
-  font-size: 30px;
-  color: yellow;
-  margin-right: 15px;
-}
-
 
 /* Dégradé de couleurs pour les cards */
 .card.primary-white {
@@ -134,75 +64,6 @@
   background: linear-gradient(135deg, #ededf6); /* Pink + Primary Pink */
   border: 2px solid #6d92d0;
   box-shadow: 0 0 15px 5px #8bb3f8;
-}
-
-.navbar {
-  border-bottom: 1px solid #8bb3f8;
-  padding: 10px 20px;
-  border-radius: 20px;
-}
-.profile-icon {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-}
-.navbar-text {
-  font-weight: bold;
-}
-.navbar .profile-container {
-  display: flex;
-  align-items: center;
-  margin-left: auto;
-}
-.navbar .dark-mode-toggle {
-  cursor: pointer;
-  font-size: 1.2rem;
-  margin-right: 20px;
-  color: #333;
-}
-
-.toggle-container {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 20px;
-}
-
-.toggle-image {
-  width: 30px;
-  height: 30px;
-  margin: 0 10px;
-  cursor: pointer;
-}
-
-.toggle-switch {
-  position: relative;
-  display: inline-block;
-  width: 60px;
-  height: 34px;
-  background-color: #ccc;
-  border-radius: 34px;
-  cursor: pointer;
-}
-
-.toggle-knob {
-  position: absolute;
-  content: "";
-  height: 26px;
-  width: 26px;
-  left: 4px;
-  bottom: 4px;
-  background-color: white;
-  border-radius: 50%;
-  transition: 0.4s;
-}
-
-.toggle-switch.active {
-  background-color: #4caf50;
-}
-
-.toggle-switch.active .toggle-knob {
-  transform: translateX(26px);
 }
 
 .primary-pink {
@@ -289,20 +150,9 @@
   padding: 20px; /* Ajoute un espace intérieur */
 }
 
-.sidebar {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between; /* Espace entre les sections */
-  height: 100vh; /* Hauteur complète de la page */
-  padding: 20px; /* Espacement intérieur */
-  background-color: #f8f9fa; /* Exemple de fond */
-}
 
-.toggle-container {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
+
+
 
 .logout {
   text-align: center;

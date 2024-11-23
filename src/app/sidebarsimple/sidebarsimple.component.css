@@ -1,3 +1,56 @@
+/* Navbar */
+.navbar {
+  position: fixed; /* Fixée en haut */
+  top: 0;
+  left: 250px; /* Commence après la sidebar */
+  width: calc(100% - 250px); /* Reste de la largeur de l'écran */
+  background-color: #ededf4; /* Couleur de fond */
+  padding: 10px 20px; /* Espacement intérieur */
+  border-bottom: 2px solid #8bb3f8; /* Bordure inférieure */
+  border-radius: 0 0 20px 20px; /* Coins arrondis en bas */
+  z-index: 1000; /* Toujours au-dessus des autres éléments */
+}
+
+/* Conteneur de la photo de profil et du nom d'utilisateur */
+.navbar .container-fluid {
+  display: flex;
+  justify-content: flex-end; /* Contenu aligné à droite */
+  align-items: center;
+}
+
+/* Profil utilisateur */
+.profile-photo-container {
+  display: flex;
+  align-items: center;
+}
+
+.profile-img {
+  width: 40px; /* Taille de l'image */
+  height: 40px;
+  border-radius: 50%; /* Rond */
+  margin-right: 10px; /* Espacement avec le texte */
+}
+
+/* Texte à côté de la photo */
+.navbar-text {
+  font-weight: bold; /* Texte en gras */
+  color: black; /* Couleur du texte */
+}
+
+/* Responsiveness */
+@media (max-width: 768px) {
+  .navbar {
+    left: 0;
+    width: 100%; /* Prend toute la largeur */
+  }
+
+  .sidebar {
+    width: 200px; /* Réduction de la sidebar sur petit écran */
+  }
+}
+
+
+/* Sidebar */
 .sidebar {
   height: 100vh;
   position: fixed;
@@ -9,6 +62,7 @@
   padding-top: 20px;
   display: flex;
   flex-direction: column;
+  padding-top: 60px; /* Ajouté pour éviter de cacher la navbar */
 }
 
 .sidebar a {
@@ -24,7 +78,7 @@
 }
 
 .sidebar .logout {
-  margin-top: auto;
+  margin-top: 20px;
   display: flex;
   align-items: center;
   padding: 15px;
@@ -37,140 +91,31 @@
 .sidebar .logout i {
   margin-right: 10px;
 }
+
 /* Contenu principal */
 .content {
   margin-left: 250px;
   padding: 20px;
 }
 
-/* Header avec profil */
-.navbar {
-  border-bottom: 1px solid #dee2e6;
-  padding: 10px 20px;
-  border-radius: 20px;
-}
-
-.profile-icon {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-}
-
-.navbar-text {
-  font-weight: bold;
-}
-
-/* Cards */
-.card {
-  border-radius: 15px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  padding: 0;
-  color: white;
-  min-height: 200px;
-}
-
-.card-body {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 20px;
-}
-
-.card-title {
-  font-size: 1.2rem;
-  color: black;
-}
-
-.card-body p {
-  font-size: 1.1rem;
-  font-weight: bold;
-  color: black;
-}
-
-/* Icones */
-.icon-container {
-  font-size: 30px;
-  color: yellow;
-  margin-right: 15px;
-}
-
-/* Dégradé de couleurs pour les cards */
-.card.primary-blue {
-  background: linear-gradient(
-    135deg,
-    #e17cfd,
-    #8bb3f8,
-    #ff69b4
-  ); /* Bleu + Primary Blue */
-  border: none;
-}
-
-.card.primary-pink {
-  background: linear-gradient(135deg, #ededf6); /* Pink + Primary Pink */
-  border: none;
-  box-shadow: 0 0 10px 5px #8bb3f8;
-}
-
-.card.primary-purple {
-  background: linear-gradient(135deg, #ededf6); /* Purple + Primary Purple */
-  border: none;
-  box-shadow: 0 0 10px 5px #8bb3f8;
-}
-
-/* Cards dans la section de droite */
-.right-cards .card {
-  margin-bottom: 20px;
-  background: linear-gradient(135deg, #ededf6); /* Pink + Primary Pink */
-  border: 2px solid #6d92d0;
-  box-shadow: 0 0 10px 5px #8bb3f8;
-}
-
-.bottom-card {
-  width: 100%;
-  background: linear-gradient(135deg, #ededf6); /* Pink + Primary Pink */
-  border: 2px solid #6d92d0;
-  box-shadow: 0 0 15px 5px #8bb3f8;
-}
-
-.navbar {
-  border-bottom: 1px solid #8bb3f8;
-  padding: 10px 20px;
-  border-radius: 20px;
-}
-.profile-icon {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-}
-.navbar-text {
-  font-weight: bold;
-}
-.navbar .profile-container {
-  display: flex;
-  align-items: center;
-  margin-left: auto;
-}
-.navbar .dark-mode-toggle {
-  cursor: pointer;
-  font-size: 1.2rem;
-  margin-right: 20px;
-  color: #333;
-}
-
+/* Styles du toggle switch dans la sidebar */
 .toggle-container {
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 20px;
+  margin-top: auto;
+  padding-bottom: 20px;
 }
 
 .toggle-image {
   width: 30px;
   height: 30px;
-  margin: 0 10px;
+  margin-right: 10px;
   cursor: pointer;
+  transition: opacity 0.3s ease;
 }
 
+/* Le switch lui-même */
 .toggle-switch {
   position: relative;
   display: inline-block;
@@ -181,6 +126,7 @@
   cursor: pointer;
 }
 
+/* Le "knob" du switch qui se déplace */
 .toggle-knob {
   position: absolute;
   content: "";
@@ -193,10 +139,45 @@
   transition: 0.4s;
 }
 
+/* Active state du toggle switch */
 .toggle-switch.active {
   background-color: #4caf50;
 }
 
 .toggle-switch.active .toggle-knob {
   transform: translateX(26px);
+}
+
+/* Cache l'image "On" quand le switch est désactivé */
+#onIcon {
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+/* Affiche l'image "Off" quand le switch est désactivé */
+#offIcon {
+  opacity: 1;
+  transition: opacity 0.3s ease;
+}
+
+/* Affiche l'image "On" quand le switch est activé et cache l'image "Off" */
+.toggle-switch.active #onIcon {
+  opacity: 1;
+}
+
+.toggle-switch.active #offIcon {
+  opacity: 0;
+}
+
+/* Masquer la sidebar sur mobile */
+@media (max-width: 768px) {
+  .sidebar {
+    display: none;
+    width: 0;
+  }
+
+  .sidebar.active {
+    display: block;
+    width: 250px;
+  }
 }

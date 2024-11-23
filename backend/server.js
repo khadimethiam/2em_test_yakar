@@ -47,15 +47,15 @@ mongoose
   .then(() => console.log("Connexion à MongoDB réussie"))
   .catch((err) => console.error("Erreur de connexion à MongoDB:", err));
 
-// Modèle Utilisateur
-const UserSchema = new mongoose.Schema({
-  nom: { type: String, required: true },
-  prenom: { type: String, required: true },
-  email: { type: String, unique: true, required: true },
-  numero_tel: { type: String, unique: true, required: true },
-  mot_de_passe: { type: String, required: true },
-  code_authentification: { type: String, required: true },
-  role: { type: String, enum: ["admin", "user"], required: true },
+  const UserSchema = new mongoose.Schema({
+    nom: { type: String, required: true },
+    prenom: { type: String, required: true },
+    email: { type: String, unique: true, required: true },
+    numero_tel: { type: String, unique: true, required: true },
+    mot_de_passe: { type: String, required: true },
+    code_authentification: { type: String, required: true },
+    role: { type: String, enum: ["admin", "user"], required: true },
+    status: { type: String, enum: ["actif", "inactif"], default: "actif" }, // Définir "actif" comme valeur par défaut
   photo: { type: String }, // Chemin de la photo
 });
 
@@ -293,6 +293,41 @@ app.put("/users/:id/role", authMiddleware, adminMiddleware, async (req, res) => 
   } catch (err) {
     console.error("Erreur lors de la mise à jour du rôle :", err);
     res.status(500).json({ message: "Erreur serveur" });
+  }
+});
+
+// Route de mise à jour du statut de l'utilisateur (avec authentification)
+app.put("/api/users/:id/status", authMiddleware, adminMiddleware, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+
+    // Vérification si le statut est valide
+    if (!['actif', 'inactif'].includes(status)) {
+      return res.status(400).json({ message: "Statut invalide. Choisissez entre 'actif' et 'inactif'" });
+    }
+
+    // Mettre à jour le statut de l'utilisateur
+    const updatedUser = await User.findByIdAndUpdate(id, { status }, { new: true });
+    if (!updatedUser) {
+      return res.status(404).json({ message: "Utilisateur non trouvé" });
+    }
+
+    res.status(200).json(updatedUser);
+  } catch (err) {
+    console.error("Erreur lors de la mise à jour du statut:", err);
+    res.status(500).json({ message: "Erreur lors de la mise à jour du statut" });
+  }
+});
+
+// Route pour récupérer tous les utilisateurs (uniquement accessible par les administrateurs)
+app.get("/api/users", authMiddleware, adminMiddleware, async (req, res) => {
+  try {
+    const users = await User.find();  // Récupère tous les utilisateurs
+    res.status(200).json(users);
+  } catch (err) {
+    console.error("Erreur lors de la récupération des utilisateurs:", err);
+    res.status(500).json({ message: "Erreur lors de la récupération des utilisateurs" });
   }
 });
 
