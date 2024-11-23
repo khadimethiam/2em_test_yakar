@@ -50,6 +50,15 @@ export class UpdateComponent implements OnInit {
     this.userId = '';
   }
 
+  onFileSelected(event: Event) {
+    const element = event.target as HTMLInputElement;
+    if (element.files && element.files.length > 0) {
+      this.fileName = element.files[0].name;
+    } else {
+      this.fileName = null;
+    }
+  }
+
   ngOnInit(): void {
   this.userId = this.route.snapshot.paramMap.get('id')!;
   this.userForm = this.fb.group({
@@ -73,8 +82,10 @@ openSuccessDialog() {
     panelClass: 'custom-dialog' // Classe CSS personnalisée
   });
 }
-
-
+passwordVisible = false;
+togglePasswordVisibility() {
+  this.passwordVisible = !this.passwordVisible;
+}
   // Chargement des données de l'utilisateur
   loadUser() {
     this.isLoading = true;

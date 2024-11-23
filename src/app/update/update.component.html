@@ -31,12 +31,16 @@
         <label for="motDePasse">Mot de passe</label>
         <div class="password-field">
           <input
-            type="password"
+          type="{{passwordVisible ? 'text' : 'password'}}"
             id="motDePasse"
             placeholder="Laissez vide pour conserver le mot de passe actuel"
             formControlName="motDePasse"
           />
-          <i class="toggle-password" (click)="toggleMotDePasse()">👁️</i>
+          <div class="input-group-append">
+            <span class="input-group-text" (click)="togglePasswordVisibility()">
+              <i class="fas" [ngClass]="{'fa-eye': !passwordVisible, 'fa-eye-slash': passwordVisible}"></i>
+            </span>
+          </div>
           <small class="text-danger" *ngIf="isFieldInvalid('motDePasse')">{{ getErrorMessage('motDePasse') }}</small>
         </div>
       </div>
@@ -51,35 +55,16 @@
           <small class="text-danger">Le rôle est requis.</small>
         </div>
       </div>
-      <div class="form-group">
-        <label for="photo">Photo</label>
-        <div class="file-upload">
-          <!-- Champ texte pour afficher le nom du fichier -->
-          <input
-            type="text"
-            class="file-name"
-            [value]="fileName || ''"
-            placeholder="Aucune image sélectionnée"
-            id="photo"
-            readonly
-          />
-      
-          <!-- Bouton pour sélectionner un fichier -->
-          <button type="button" class="btn-choose-file" (click)="triggerFileInput()">
-            Choisir un fichier
-          </button>
-      
-          <!-- Input fichier caché -->
-          <input
-            type="file"
-            #fileInput
-            (change)="onFileChange($event)"
-            style="display: none"
-          />
-          <!-- Affichage du message d'erreur -->
+      <!-- component.html -->
+<div class="form-group">
+  <label for="photo">Photo</label>
+  <div class="custom-file">
+    <input type="file" class="custom-file-input" id="photo" formControlName="photo" (change)="onFileSelected($event)">
+    <label class="custom-file-label" for="photo-input">{{ fileName || 'Aucune image sélectionnée' }}</label>
+  </div>
   <small class="text-danger" *ngIf="fileError">{{ fileError }}</small>
-        </div>
-      </div>
+</div>
+        
       
     </div>
 

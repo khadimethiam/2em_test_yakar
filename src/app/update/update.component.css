@@ -178,18 +178,18 @@
     font-size: 14px;
     color: #777;
   }
-  
+/*   
   .password-field {
     position: relative;
-  }
+  } */
   
-  .password-field .toggle-password {
+  /* .password-field .toggle-password {
     position: absolute;
     right: 10px;
     top: 50%;
     transform: translateY(-50%);
     cursor: pointer;
-  }
+  } */
   
   .form-actions {
     display: flex;
@@ -231,6 +231,11 @@
   .custom-file-upload .btn {
     margin-right: 10px;
   }
+
+  /* component.css */
+.file-name ~ .custom-file-label::after {
+  content: "Choisir un fichier";
+}
   
   .file-name {
     font-size: 14px;
@@ -248,3 +253,24 @@
     border: 1px solid #ccc;
   }
   
+  .input-group-text {
+    cursor: pointer;
+  }
+
+  .password-field {
+    position: relative;
+  }
+  
+  .password-field input {
+    padding-right: 40px; /* Espace pour l'icône */
+  }
+  
+  .password-field .input-group-text {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    background-color: transparent;
+    border: none;
+  }
