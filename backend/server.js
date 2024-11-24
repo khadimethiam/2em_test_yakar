@@ -58,7 +58,12 @@ const UserSchema = new mongoose.Schema({
   nom: { type: String, required: true },
   prenom: { type: String, required: true },
   email: { type: String, unique: true, required: true },
-  numero_tel: { type: String, unique: true, required: true },
+  numero_tel: {
+    type: String,
+    unique: true,
+    required: true,
+    match: /^(70|75|76|77|78)\d{7}$/,
+  },
   mot_de_passe: { type: String, required: true },
   code_authentification: { type: String, required: true },
   role: { type: String, enum: ["admin", "user"], required: true },
@@ -162,6 +167,68 @@ app.post("/register", upload.single("photo"), async (req, res) => {
   }
 });
 
+// Route de modification d'un utilisateur
+app.put("/update/:id", async (req, res) => {
+  const { nom, prenom, email, numero_tel, mot_de_passe, role } = req.body;
+  const { id } = req.params; // Récupère l'id de l'utilisateur depuis les paramètres de la requête
+
+  try {
+    // Vérifie si l'utilisateur existe
+    const user = await User.findById(id);
+    if (!user) {
+      return res.status(404).json({ message: "Utilisateur non trouvé" });
+    }
+
+    // Vérifie si l'email est déjà utilisé par un autre utilisateur
+    const emailExists = await User.findOne({ email, _id: { $ne: id } });
+    if (emailExists) {
+      return res.status(400).json({
+        message: "Cet email est déjà utilisé par un autre utilisateur.",
+      });
+    }
+
+    // Mise à jour des données de l'utilisateur
+    user.nom = nom || user.nom;
+    user.prenom = prenom || user.prenom;
+    user.email = email || user.email;
+    user.role = role || user.role;
+    user.numero_tel = numero_tel || user.numero_tel;
+
+    // Mise à jour et hachage du mot de passe si un nouveau mot de passe est fourni
+    if (mot_de_passe) {
+      user.mot_de_passe = await bcrypt.hash(mot_de_passe, 10);
+    }
+
+    // Enregistrer les changements
+    const updatedUser = await user.save();
+
+    // Répondre avec les données mises à jour
+    res.status(200).json({
+      _id: updatedUser.id,
+      nom: updatedUser.nom,
+      prenom: updatedUser.prenom,
+      email: updatedUser.email,
+      role: updatedUser.role,
+      numero_tel: updatedUser.numero_tel,
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// Obtenir un utilisateur par ID
+app.get("/user/:id", async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+    if (!user) {
+      return res.status(404).json({ message: "Utilisateur non trouvé" });
+    }
+    res.json(user);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
 // Route de connexion
 app.post("/login", async (req, res) => {
   try {
@@ -175,12 +242,10 @@ app.post("/login", async (req, res) => {
     }
 
     if (user.status === "inactif") {
-      return res
-        .status(403)
-        .json({
-          message:
-            "Votre compte est inactif. Veuillez contacter l'administrateur.",
-        });
+      return res.status(403).json({
+        message:
+          "Votre compte est inactif. Veuillez contacter l'administrateur.",
+      });
     }
 
     const isMatch = await bcrypt.compare(mot_de_passe, user.mot_de_passe);
@@ -216,12 +281,10 @@ app.post("/login-code", async (req, res) => {
     }
 
     if (user.status === "inactif") {
-      return res
-        .status(403)
-        .json({
-          message:
-            "Votre compte est inactif. Veuillez contacter l'administrateur.",
-        });
+      return res.status(403).json({
+        message:
+          "Votre compte est inactif. Veuillez contacter l'administrateur.",
+      });
     }
 
     const token = jwt.sign(
@@ -299,6 +362,34 @@ app.get("/api/users", authenticate, async (req, res) => {
     res
       .status(500)
       .json({ message: "Erreur lors de la récupération des utilisateurs" });
+  }
+});
+
+// Fonction pour hacher un mot de passe
+const hashPassword = async (plainPassword) => {
+  try {
+    const saltRounds = 10; // Nombre de rounds pour générer le sel
+    const hashedPassword = await bcrypt.hash(plainPassword, saltRounds);
+    return hashedPassword;
+  } catch (error) {
+    console.error("Erreur lors du hachage du mot de passe :", error);
+    throw error;
+  }
+};
+
+// Exemple d'utilisation dans une route Express
+app.post("/hash-password", async (req, res) => {
+  const { password } = req.body;
+
+  if (!password) {
+    return res.status(400).json({ error: "Mot de passe requis" });
+  }
+
+  try {
+    const hashedPassword = await hashPassword(password);
+    res.status(200).json({ hashedPassword });
+  } catch (error) {
+    res.status(500).json({ error: "Erreur lors du hachage du mot de passe" });
   }
 });
 

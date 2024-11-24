@@ -3,6 +3,8 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { SidebarComponent } from '../sidebar/sidebar.component';
+import { UtilisateurService } from '../services/utilisateur.service';
+import { Router } from '@angular/router';
 
 import * as bootstrap from 'bootstrap';
 import { NavComponent } from '../nav/nav.component';
@@ -59,7 +61,11 @@ export class UserListComponent {
   totalItems: number = 0; // Nombre total d'utilisateurs
   totalPages: number = 0; // Nombre total de pages
 
-  constructor(private http: HttpClient) {}
+  constructor(
+    private http: HttpClient,
+    userService: UtilisateurService,
+    private router: Router
+  ) {}
 
   ngOnInit() {
     this.getUsers(); // Charger les utilisateurs au démarrage
@@ -293,6 +299,10 @@ export class UserListComponent {
       document.getElementById('confirmationModal')!
     );
     modal.show(); // Afficher le modal de confirmation
+  }
+
+  onEdit(userId: string): void {
+    this.router.navigate(['/update', userId]);
   }
 
   // Méthode pour confirmer le changement de statut
