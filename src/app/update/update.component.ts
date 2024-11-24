@@ -150,4 +150,6 @@ export class UpdateComponent implements OnInit {
     console.log('cancel: Annulation et retour au tableau de bord');
     this.router.navigate(['/user-list']);
   }
+
+  
 }

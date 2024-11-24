@@ -121,7 +121,7 @@ export class LoginCodeComponent implements OnInit, OnDestroy {
     if (res.token) {
       localStorage.setItem('token', res.token);
       const role = this.getRoleFromToken(res.token);
-      const route = role === 'admin' ? '/dashboard' : '/dashboard-user';
+      const route = role === 'admin' ? '/dashboard' : '/dashboard-simple';
       this.router.navigate([route]);
     } else {
       this.handleLoginError();

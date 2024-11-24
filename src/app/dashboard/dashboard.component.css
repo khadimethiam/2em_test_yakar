@@ -62,8 +62,10 @@
 .bottom-card {
   width: 100%;
   background: linear-gradient(135deg, #ededf6); /* Pink + Primary Pink */
-  border: 2px solid #6d92d0;
+  border: 1px solid #6d92d0;
   box-shadow: 0 0 15px 5px #8bb3f8;
+  bottom: 119%;
+
 }
 
 .primary-pink {
@@ -163,4 +165,8 @@
 
 .logout:hover {
   color: #007bff; /* Changement de couleur au survol */
+}
+.container , h2 {
+
+  text-align: center;
 }
