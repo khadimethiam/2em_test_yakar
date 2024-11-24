@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
+
 
 @Injectable({
   providedIn: 'root',
@@ -68,4 +69,18 @@ export class AuthService {
   setToken(token: string): void {
     localStorage.setItem('token', token);
   }
+
+ // Méthode pour récupérer les informations de l'utilisateur connecté
+getUserProfile(): Observable<any> {
+  const token = this.getToken();
+
+  // Configuration des en-têtes avec HttpHeaders
+  let headers = new HttpHeaders();
+  if (token) {
+    headers = headers.set('Authorization', `Bearer ${token}`);
+  }
+
+  return this.http.get(`${this.apiUrl}/profile`, { headers });
+}
+
 }

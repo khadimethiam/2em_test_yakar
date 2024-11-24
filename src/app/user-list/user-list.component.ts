@@ -26,6 +26,16 @@ interface User {
   styleUrls: ['./user-list.component.css']
 })
 export class UserListComponent {
+editUser(_t113: User) {
+throw new Error('Method not implemented.');
+}
+user: any;
+onSubmitAddUser() {
+throw new Error('Method not implemented.');
+}
+onSubmitUpdateUser() {
+throw new Error('Method not implemented.');
+}
   showAccountForm: boolean = false;
   showPersonalInfoForm: boolean = false;
   users: User[] = [];
@@ -60,6 +70,8 @@ export class UserListComponent {
   itemsPerPage: number = 8; // Nombre d'utilisateurs par page
   totalItems: number = 0;   // Nombre total d'utilisateurs
   totalPages: number = 0;   // Nombre total de pages
+showForm: any;
+isEditing: any;
 
   constructor(private http: HttpClient) {}
 
@@ -87,6 +99,8 @@ export class UserListComponent {
       }
     );
   }
+
+  
 
  // Filtrer les utilisateurs en fonction de leur rôle
 filterUsers(role: string) {
@@ -337,6 +351,8 @@ onSearchPhone() {
       user.numero_tel.includes(this.searchPhone)
     );
   }
+
+  
   
   // Met à jour la pagination
   this.totalItems = this.filteredUsers.length;
@@ -353,4 +369,6 @@ togglePasswordVisibility() {
   getPageNumbers(): number[] {
     return Array.from({ length: this.totalPages }, (_, i) => i + 1);
   }
+
+  
 }

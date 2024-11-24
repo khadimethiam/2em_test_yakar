@@ -8,6 +8,7 @@ import { LoginCodeComponent } from './login-code/login-code.component';
 import { UserListComponent } from './user-list/user-list.component';
 import { SidebarComponent } from './sidebar/sidebar.component';
 import { SidebarsimpleComponent } from './sidebarsimple/sidebarsimple.component';
+import { UpdateComponent } from './update/update.component';
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -17,6 +18,7 @@ export const routes: Routes = [
   { path: 'user-list',component:UserListComponent},
   { path: 'sidebar',component:SidebarComponent},
   { path: 'sidebarsimple', component:SidebarsimpleComponent},
+  {path: 'update',component:UpdateComponent},
 
 
   {

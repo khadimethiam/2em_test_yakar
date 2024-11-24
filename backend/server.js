@@ -330,6 +330,29 @@ app.get("/api/users", authMiddleware, adminMiddleware, async (req, res) => {
     res.status(500).json({ message: "Erreur lors de la récupération des utilisateurs" });
   }
 });
+// Route pour récupérer les informations de l'utilisateur connecté
+app.get("/profile", authMiddleware, async (req, res) => {
+  try {
+    const user = await User.findById(req.user.userId).select("nom prenom photo");
+    if (!user) {
+      return res.status(404).json({ message: "Utilisateur non trouvé" });
+    }
+
+    // Ajouter le chemin complet pour la photo
+    const profile = {
+      nom: user.nom,
+      prenom: user.prenom,
+      photo: user.photo ? `/uploads/${user.photo}` : null, // Chemin relatif à `uploads`
+    };
+
+    res.status(200).json(profile);
+  } catch (err) {
+    console.error("Erreur lors de la récupération du profil :", err);
+    res.status(500).json({ message: "Erreur serveur" });
+  }
+});
+
+
 
 // Démarrage du serveur
 const port = process.env.PORT || 3000;
