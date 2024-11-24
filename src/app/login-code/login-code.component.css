@@ -18,6 +18,11 @@ body {
   background-color: #1a1a1a;
   color: #f1f1f1;
 }
+.masked {
+  background-color: #ddd;
+  color: transparent;
+  text-shadow: 0 0 0 #000;
+}
 
 .container {
   width: 80%;

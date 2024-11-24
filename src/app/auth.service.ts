@@ -23,4 +23,20 @@ export class AuthService {
       code_authentification: code,
     });
   }
+
+  checkUserExists(email: string): Observable<{ exists: boolean }> {
+    return this.http.get<{ exists: boolean }>(
+      `${this.apiUrl}/check-user-exists?email=${email}`
+    );
+  }
+  // Méthode pour se déconnecter
+  logout(): Observable<any> {
+    // Supprimer le token du localStorage
+    localStorage.removeItem('token');
+    // Vous pouvez également envoyer une requête au backend pour invalider le token si nécessaire
+    return new Observable(observer => {
+      observer.next();
+      observer.complete();
+    });
+  }
 }

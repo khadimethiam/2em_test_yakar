@@ -1,11 +1,5 @@
-<div [ngClass]="themeService.getMode() + '-mode'">
-  <router-outlet></router-outlet>
-  <!-- Bouton pour basculer entre les modes clair et sombre -->
-  <button class="toggle-btn" (click)="toggleMode()">
-    <i
-      [class]="
-        themeService.getMode() === 'light' ? 'fas fa-moon' : 'fas fa-sun'
-      "
-    ></i>
-  </button>
+<div class="main-container">
+  <div class="content">
+    <router-outlet></router-outlet>
+  </div>
 </div>

@@ -1,0 +1,130 @@
+<div *ngIf="isLoading">Chargement des données...</div>
+
+<div class="container">
+  <h1>Modification d'un utilisateur</h1>
+  <form *ngIf="!isLoading" [formGroup]="userForm" (ngSubmit)="onSubmit()">
+    <div class="form-row">
+      <div class="form-group">
+        <label for="nom">Nom</label>
+        <input
+          type="text"
+          id="nom"
+          formControlName="nom"
+          [ngClass]="{ 'is-invalid': isFieldInvalid('nom') }"
+          placeholder="Nom"
+        />
+        <small class="text-danger" *ngIf="isFieldInvalid('nom')">{{
+          getErrorMessage("nom")
+        }}</small>
+      </div>
+      <div class="form-group">
+        <label for="prenom">Prénom</label>
+        <input
+          type="text"
+          id="prenom"
+          formControlName="prenom"
+          placeholder="Prénom"
+        />
+        <small class="text-danger" *ngIf="isFieldInvalid('prenom')">{{
+          getErrorMessage("prenom")
+        }}</small>
+      </div>
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input
+          type="email"
+          id="email"
+          formControlName="email"
+          placeholder="Email"
+          autocomplete="off"
+        />
+        <small class="text-danger" *ngIf="isFieldInvalid('email')">{{
+          getErrorMessage("email")
+        }}</small>
+      </div>
+      <div class="form-group">
+        <label for="telephone">Téléphone</label>
+        <input
+          type="text"
+          id="telephone"
+          formControlName="telephone"
+          placeholder="Téléphone"
+        />
+        <small class="text-danger" *ngIf="isFieldInvalid('telephone')">{{
+          getErrorMessage("telephone")
+        }}</small>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label for="motDePasse">Mot de passe</label>
+        <div class="password-field">
+          <input
+            type="{{ passwordVisible ? 'text' : 'password' }}"
+            id="motDePasse"
+            placeholder="Laissez vide pour conserver le mot de passe actuel"
+            formControlName="motDePasse"
+          />
+          <div class="input-group-append">
+            <span class="input-group-text" (click)="togglePasswordVisibility()">
+              <i
+                class="fas"
+                [ngClass]="{
+                  'fa-eye': !passwordVisible,
+                  'fa-eye-slash': passwordVisible
+                }"
+              ></i>
+            </span>
+          </div>
+          <small class="text-danger" *ngIf="isFieldInvalid('motDePasse')">{{
+            getErrorMessage("motDePasse")
+          }}</small>
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="role">Rôle</label>
+        <select id="role" formControlName="role">
+          <option selected disabled>Veuillez choisir un role</option>
+          <option value="admin">Admin</option>
+          <option value="simple">Utilisateur Simple</option>
+        </select>
+        <div
+          *ngIf="userForm.get('role')?.invalid && userForm.get('role')?.touched"
+        >
+          <small class="text-danger">Le rôle est requis.</small>
+        </div>
+      </div>
+      <!-- component.html -->
+      <div class="form-group">
+        <label for="photo">Photo</label>
+        <div class="custom-file">
+          <input
+            type="file"
+            class="custom-file-input"
+            id="photo"
+            formControlName="photo"
+            (change)="onFileSelected($event)"
+          />
+          <label class="custom-file-label" for="photo-input">{{
+            fileName || "Aucune image sélectionnée"
+          }}</label>
+        </div>
+        <small class="text-danger" *ngIf="fileError">{{ fileError }}</small>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button type="button" class="btn btn-danger" (click)="onCancel()">
+        Annuler
+      </button>
+      <button
+        type="submit"
+        class="btn btn-primary"
+        [disabled]="userForm.invalid"
+      >
+        Modifier
+      </button>
+    </div>
+  </form>
+</div>

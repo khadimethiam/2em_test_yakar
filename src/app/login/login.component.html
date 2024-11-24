@@ -32,6 +32,9 @@
               />
             </div>
           </div>
+          <div class="error-message" *ngIf="errorMessages.email">
+            {{ errorMessages.email }}
+          </div>
 
           <!-- Champ de saisie pour le mot de passe -->
           <div class="input-div pass" [class.focus]="focusState['password']">
@@ -49,6 +52,14 @@
                 required
               />
             </div>
+          </div>
+          <div class="error-message" *ngIf="errorMessages.mot_de_passe">
+            {{ errorMessages.mot_de_passe }}
+          </div>
+
+          <!-- Message d'erreur général -->
+          <div class="error-message" *ngIf="errorMessage">
+            {{ errorMessage }}
           </div>
 
           <a href="#">Mot de passe oublié?</a>

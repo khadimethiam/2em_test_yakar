@@ -1,0 +1,46 @@
+/* Navbar */
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 80%;
+  /*   z-index: 1000;
+ */
+  background-color: #ededf4;
+  padding: 10px 20px;
+  margin-left: 300px;
+  margin-top: 30px;
+  border-radius: 50px;
+  border-bottom: solid #8bb3f8 2px;
+}
+
+/* Conteneur de la photo de profil et du nom d'utilisateur dans la navbar */
+.navbar .container-fluid {
+  display: flex;
+  justify-content: flex-end; /* Aligner à droite */
+}
+
+/* Styles pour l'élément de la photo de profil et du nom d'utilisateur */
+.navbar .d-flex {
+  display: flex;
+  align-items: center; /* Aligne les éléments verticalement au centre */
+}
+
+/* Styles pour la photo de profil */
+.profile-photo-container {
+  display: flex;
+  align-items: center;
+}
+
+.profile-img {
+  width: 40px; /* Ajustez la taille de la photo de profil */
+  height: 40px;
+  border-radius: 50%;
+}
+
+/* Espacement entre la photo et le nom */
+.navbar .ms-2 {
+  font-weight: 600;
+  color: black;
+  margin-left: 10px; /* Ajoute un petit espace entre l'image et le nom */
+}
