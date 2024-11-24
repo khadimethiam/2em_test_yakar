@@ -1,233 +1,153 @@
-import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { Component, OnInit } from '@angular/core';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { UtilisateurService } from '../services/utilisateur.service';
-import { ActivatedRoute, Router } from '@angular/router';
-import { ReactiveFormsModule } from '@angular/forms';
-import { MatDialog } from '@angular/material/dialog';
-import { SuccessDialogComponent } from '../success.component';
+import { FormsModule } from '@angular/forms';
+import { SidebarComponent } from '../sidebar/sidebar.component';
+import * as bcrypt from 'bcryptjs';
+
+
+
+interface User {
+  _id: string;
+  prenom: string;
+  nom: string;
+  numero_tel: string;
+  email: string;
+  status: string;
+  password: string;
+  role: string;
+  photo: string | null;
+}
 
 @Component({
   selector: 'app-update',
   standalone: true,
-  imports: [FormsModule, CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, FormsModule, SidebarComponent],
   templateUrl: './update.component.html',
-  styleUrl: './update.component.css',
+  styleUrls: ['./update.component.css'],
 })
 export class UpdateComponent implements OnInit {
-  userForm: FormGroup;
-  userId: string;
-  isLoading = false;
-  fileName: string | null = null;
-  photoPreview: string | null = null;
-  fileError: string | null = null;
+  showPersonalInfoForm: boolean = true;
+  showAccountForm: boolean = false;
+  showPassword: boolean = false;
+  userId: string = '';
+  isSubmitting: boolean = false;
+  errorMessage: string = '';
+  successMessage: string = '';
 
-  @ViewChild('fileInput', { static: false })
-  fileInput!: ElementRef<HTMLInputElement>;
+  userPersonalInfo: User = {
+    _id: '',
+    nom: '',
+    prenom: '',
+    email: '',
+    numero_tel: '',
+    status: '',
+    password: '',
+    role: '',
+    photo: null,
+  };
 
-  constructor(
-    private fb: FormBuilder,
-    private userService: UtilisateurService,
-    private route: ActivatedRoute,
-    private router: Router,
-    private dialog: MatDialog
-  ) {
-    // Configuration du formulaire avec validation
-    this.userForm = this.fb.group({
-      nom: [
-        '',
-        [
-          Validators.required,
-          Validators.pattern(/^(?!\s)(?!.*\s\s)[a-zA-Z\s]*$/),
-        ],
-      ],
-      prenom: [
-        '',
-        [
-          Validators.required,
-          Validators.pattern(/^(?!\s)(?!.*\s\s)[a-zA-Z\s]*$/),
-        ],
-      ],
-      email: ['', [Validators.required, Validators.email]],
-      telephone: [
-        '',
-        [Validators.required, Validators.pattern(/^(70|75|76|77|78)\d{7}$/)],
-      ],
-      role: ['', [Validators.required]],
-      motDePasse: ['', Validators.minLength(8)], // Validation de mot de passe
-      photo: [null],
-    });
-    this.userId = '';
-  }
+  userAccountInfo = {
+    oldPassword: '',
+    password: '',
+    photo: null as File | null,
+  };
+  
 
-  onFileSelected(event: Event) {
-    const element = event.target as HTMLInputElement;
-    if (element.files && element.files.length > 0) {
-      this.fileName = element.files[0].name;
-    } else {
-      this.fileName = null;
+  constructor(private http: HttpClient, private router: Router) {}
+
+  ngOnInit() {
+    const userDataString = localStorage.getItem('userToUpdate');
+    if (userDataString) {
+      const userData = JSON.parse(userDataString);
+      this.userId = userData._id;
+      this.userPersonalInfo = { ...userData, password: '' };
+      if (userData.photo) {
+        this.userAccountInfo.photo = userData.photo;
+      }
     }
   }
-
-  ngOnInit(): void {
-    this.userId = this.route.snapshot.paramMap.get('id')!;
-    this.userForm = this.fb.group({
-      nom: [
-        '',
-        [
-          Validators.required,
-          Validators.pattern(/^(?!\s)(?!.*\s\s)[a-zA-Z\s]*$/),
-        ],
-      ],
-      prenom: [
-        '',
-        [
-          Validators.required,
-          Validators.pattern(/^(?!\s)(?!.*\s\s)[a-zA-Z\s]*$/),
-        ],
-      ],
-      email: ['', [Validators.required, Validators.email]],
-      telephone: [
-        '',
-        [Validators.required, Validators.pattern(/^(70|75|76|77|78)\d{7}$/)],
-      ],
-      motDePasse: ['', Validators.minLength(8)], // Validation de mot de passe
-      role: ['', Validators.required],
-    });
-
-    // Charger les données de l'utilisateur
-    this.loadUser();
+  
+  onSubmitPersonalInfo() {
+    console.log('onSubmitPersonalInfo: Passage au formulaire des informations de compte');
+    this.showPersonalInfoForm = false;
+    this.showAccountForm = true;
   }
 
-  openSuccessDialog() {
-    this.dialog.open(SuccessDialogComponent, {
-      width: '400px',
-      disableClose: true, // Empêche la fermeture en cliquant en dehors
-      hasBackdrop: true, // Active l’arrière-plan
-      panelClass: 'custom-dialog', // Classe CSS personnalisée
-    });
+  onSubmitAccountInfo() {
+    console.log('onSubmitAccountInfo: Soumission des informations de compte');
+    if (this.isSubmitting) {
+      console.warn('onSubmitAccountInfo: Soumission déjà en cours');
+      return;
+    }
+    this.isSubmitting = true;
+  
+    const token = localStorage.getItem('token');
+    const headers = new HttpHeaders({ Authorization: `Bearer ${token}` });
+  
+    // Vérification de l'ancien mot de passe
+    this.http
+      .post(`http://localhost:3000/users/verify-password`, {
+        userId: this.userId,
+        oldPassword: this.userAccountInfo.oldPassword,
+      }, { headers })
+      .subscribe(
+        (response: any) => {
+          console.log('Ancien mot de passe validé:', response);
+  
+          // Hacher le nouveau mot de passe avant de l'envoyer
+          const hashedPassword = bcrypt.hashSync(this.userAccountInfo.password, 10);
+  
+          const formData = new FormData();
+          formData.append('nom', this.userPersonalInfo.nom);
+          formData.append('prenom', this.userPersonalInfo.prenom);
+          formData.append('email', this.userPersonalInfo.email);
+          formData.append('numero_tel', this.userPersonalInfo.numero_tel);
+          formData.append('password', hashedPassword);
+          if (this.userAccountInfo.photo) {
+            formData.append('photo', this.userAccountInfo.photo);
+          }
+  
+          this.http.put(`http://localhost:3000/users/${this.userId}`, formData, { headers }).subscribe(
+            (updateResponse: any) => {
+              console.log('Mise à jour réussie:', updateResponse);
+              this.isSubmitting = false;
+              this.successMessage = 'Mise à jour réussie.';
+              this.router.navigate(['/user-list']);
+            },
+            (updateError) => {
+              console.error('Erreur lors de la mise à jour:', updateError);
+              this.isSubmitting = false;
+              this.errorMessage = "Une erreur s'est produite.";
+            }
+          );
+        },
+        (error) => {
+          console.error('Ancien mot de passe invalide:', error);
+          this.isSubmitting = false;
+          this.errorMessage = 'Ancien mot de passe incorrect.';
+        }
+      );
   }
-  passwordVisible = false;
+  
   togglePasswordVisibility() {
-    this.passwordVisible = !this.passwordVisible;
-  }
-  // Chargement des données de l'utilisateur
-  loadUser() {
-    this.isLoading = true;
-    this.userService.getUserById(this.userId).subscribe({
-      next: (user) => {
-        this.userForm.patchValue({
-          nom: user.nom,
-          prenom: user.prenom,
-          email: user.email,
-          telephone: user.numero_tel,
-          role: user.role,
-          photo: user.photo,
-        });
-        this.isLoading = false;
-      },
-      error: (err) => {
-        console.error(err);
-        this.isLoading = false;
-      },
-    });
+    this.showPassword = !this.showPassword;
+    console.log('togglePasswordVisibility: Visibilité du mot de passe modifiée', this.showPassword);
   }
 
-  // Validation des fichiers photo
-  onFileChange(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    if (input.files && input.files.length > 0) {
-      const file = input.files[0];
-
-      if (file.size > 5 * 1024 * 1024) {
-        this.fileError = 'Le fichier doit être inférieur à 5 Mo.';
-        this.fileName = null;
-        return;
-      }
-
-      if (!file.type.startsWith('image/')) {
-        this.fileError = 'Seules les images sont autorisées (png, jpeg, etc.).';
-        this.fileName = null;
-        return;
-      }
-
-      this.fileName = file.name;
-      this.fileError = null;
+  onFileChange(event: any) {
+    const file = event.target.files[0];
+    if (file) {
+      console.log('onFileChange: Fichier sélectionné', file);
+      this.userAccountInfo.photo = file;
+    } else {
+      console.warn('onFileChange: Aucun fichier sélectionné');
     }
   }
 
-  triggerFileInput(): void {
-    this.fileInput.nativeElement.click();
-  }
-
-  motDePasseVisible: boolean = false;
-
-  toggleMotDePasse(): void {
-    const input = document.getElementById('motDePasse') as HTMLInputElement;
-    input.type = input.type === 'password' ? 'text' : 'password';
-  }
-
-  // Annuler la modification
-  onCancel() {
-    this.router.navigate(['/login']);
-  }
-
-  // Soumission du formulaire
-  onSubmit() {
-    const formData = this.userForm.value;
-
-    if (!formData.motDePasse) {
-      // Supprimez le champ si l'utilisateur n'a pas saisi un nouveau mot de passe
-      delete formData.motDePasse;
-    }
-
-    this.userService.modifierUtilisateur(this.userId, formData).subscribe({
-      next: () => this.openSuccessDialog(),
-      error: () => alert('Erreur lors de la mise à jour.'),
-    });
-  }
-
-  // Vérification si un champ est invalide et touché
-  isFieldInvalid(fieldName: string): boolean {
-    const field = this.userForm.get(fieldName);
-    return !!field?.invalid && (!!field.dirty || !!field.touched);
-  }
-
-  getErrorMessage(fieldName: string): string | null {
-    const field = this.userForm.get(fieldName);
-    if (!field) return null;
-
-    if (fieldName === 'motDePasse' && field.errors?.['minlength']) {
-      return `Le mot de passe doit contenir au moins ${field.errors['minlength'].requiredLength} caractères.`;
-    }
-
-    console.log(`${fieldName} errors:`, field.errors);
-
-    if (field.errors?.['required']) return 'Ce champ est obligatoire.';
-
-    if (field.errors?.['minlength']) {
-      const minLength = field.errors['minlength'].requiredLength;
-      return `Ce champ doit contenir au moins ${minLength} caractères.`;
-    }
-
-    if (field.errors?.['email'])
-      return 'Veuillez entrer une adresse e-mail valide.';
-
-    if (field.errors?.['pattern']) {
-      // Gestion spécifique des patterns selon le champ
-      switch (fieldName) {
-        case 'nom':
-          return 'Ce champ ne peut contenir que des lettres et des espaces sans espaces consécutifs.';
-        case 'prenom':
-          return 'Ce champ ne peut contenir que des lettres et des espaces sans espaces consécutifs.';
-        case 'telephone':
-          return 'Le numéro de téléphone doit être valide et commencer par 70, 75, 76, 77 ou 78.';
-        default:
-          return 'Le format de ce champ est invalide.';
-      }
-    }
-
-    return null;
+  cancel() {
+    console.log('cancel: Annulation et retour au tableau de bord');
+    this.router.navigate(['/user-list']);
   }
 }

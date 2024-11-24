@@ -9,6 +9,8 @@ const jwt = require("jsonwebtoken");
 const multer = require("multer");
 const path = require("path");
 const { SerialPort, ReadlineParser } = require("serialport");
+const { Request, Response } = require('express');
+
 
 const app = express();
 const server = http.createServer(app);
@@ -34,7 +36,7 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // Connexion à MongoDB
 mongoose
-  .connect("mongodb://localhost:27017/2em_test_yakar", {
+  .connect("mongodb://localhost:27017/Projet_Angular", {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   })
@@ -303,7 +305,7 @@ app.get("/api/users", authenticate, async (req, res) => {
 });
 
 // Configuration du port série pour lire les données du keypad
-const portPath = "COM4"; // Remplacez 'COM4' par le port série de votre Arduino
+/*const portPath = "COM4"; // Remplacez 'COM4' par le port série de votre Arduino
 if (!portPath) {
   console.error("Le chemin du port série n'est pas défini");
   process.exit(1);
@@ -324,12 +326,65 @@ parser.on("data", (data) => {
   console.log("Données du keypad reçues:", data);
   // Envoyer les données du keypad à tous les clients connectés
   io.emit("keypad-input", data);
-});
+});*/
 
 // Démarrage du serveur
 server.listen(3000, () => {
   console.log("Serveur démarré sur le port 3000");
 });
+
+
+// Route pour mettre à jour les informations de l'utilisateur (y compris la photo)
+app.put("/users/:id", authenticate, upload.single("photo"), async (req, res) => {
+  try {
+    const id = req.params.id;
+    const updates = req.body;
+
+    // Ajout de la gestion du fichier photo
+    if (req.file) {
+      updates.photo = req.file.path;  // Assurez-vous que le chemin est correct
+    }
+
+    // Mise à jour de l'utilisateur dans la base de données
+    const updatedUser = await User.findByIdAndUpdate(id, updates, { new: true });
+
+    if (!updatedUser) {
+      return res.status(404).send("Utilisateur non trouvé");
+    }
+
+    res.status(200).json({ message: "Mise à jour réussie", user: updatedUser });
+  } catch (err) {
+    console.error("Erreur lors de la mise à jour :", err);
+    res.status(500).send("Erreur serveur");
+  }
+});
+
+
+app.post("/users/verify-password", authenticate, async (req, res) => {
+  try {
+    const { userId, oldPassword } = req.body;
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({ message: "Utilisateur non trouvé" });
+    }
+
+    // Vérification du mot de passe actuel
+    const isMatch = await bcrypt.compare(oldPassword, user.mot_de_passe);
+    if (!isMatch) {
+      return res.status(400).json({ message: "Ancien mot de passe incorrect" });
+    }
+
+    res.status(200).json({ message: "Ancien mot de passe valide" });
+  } catch (err) {
+    console.error("Erreur lors de la vérification du mot de passe:", err);
+    res.status(500).json({ message: "Erreur serveur" });
+  }
+});
+
+
+
+
 // 3. Déconnexion
 app.post("/logout", authenticate, (req, res) => {
   const token = req.headers.authorization?.split(" ")[1];

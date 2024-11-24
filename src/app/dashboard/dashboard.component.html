@@ -1,7 +1,18 @@
-<app-nav></app-nav>
-<div class="main-container">
-  <app-sidebar></app-sidebar>
-  <div class="content">
+<app-sidebar> </app-sidebar>
+
+<!-- Section principale -->
+
+
+
+  <!-- Section principale -->
+   <div class="container">
+    <div class="row mb-4">
+      <div class="col-12">
+        <br />
+        <h2>Statistiques des températures et d'humidités du Magasin</h2>
+      </div>
+    </div>
+
     <!-- Graphique et Cards -->
     <div class="row">
       <!-- Graphique -->
@@ -27,37 +38,43 @@
               </div>
             </div>
           </div>
+          
+          
 
           <!-- Card Humidité et humidité matin-->
           <div class="col-md-6">
             <div class="card primary-pink">
               <div class="card-body">
                 <div class="d-flex align-items-center">
-                  <div class="icon-container"></div>
+                  <div class="icon-container">
+                  
+                  </div>
                   <div>
                     <h5 class="card-title">Humidité matin</h5>
                     <!-- Affiche la valeur de l'humidité récupérée -->
-                    <p>{{ humidity_23h05 }}</p>
+                    <p>{{ humidity_23h05}}</p>
                     <h5 class="card-title">Temperature matin</h5>
                     <!-- Affiche la valeur de l'humidité récupérée -->
-                    <p>{{ temperature_23h05 }}</p>
+                    <p>{{ temperature_23h05}}</p>
                   </div>
                 </div>
               </div>
             </div>
           </div>
 
-          <!-- Card Humidité et humidité midi-->
+           <!-- Card Humidité et humidité midi-->
           <div class="col-md-6 mt-4">
             <div class="card primary-purple">
               <div class="card-body">
                 <div class="d-flex align-items-center">
-                  <div class="icon-container"></div>
+                  <div class="icon-container">
+                   
+                  </div>
                   <div>
                     <h5 class="card-title">Temperature midi</h5>
-                    <p>{{ temperature_23h10 }}</p>
+                    <p>{{temperature_23h10}}</p>
                     <h5 class="card-title">Humidité midi</h5>
-                    <p>{{ humidity_23h10 }}</p>
+                    <p>{{humidity_23h10}}</p>
                   </div>
                 </div>
               </div>
@@ -69,12 +86,14 @@
             <div class="card primary-blue">
               <div class="card-body">
                 <div class="d-flex align-items-center">
-                  <div class="icon-container"></div>
+                  <div class="icon-container">
+                   
+                  </div>
                   <div>
                     <h5 class="card-title">Humidité Soir</h5>
-                    <p>{{ humidity_23h14 }}</p>
+                    <p>{{humidity_23h14}}</p>
                     <h5 class="card-title">Temperature Soir</h5>
-                    <p>{{ temperature_23h14 }}</p>
+                    <p>{{temperature_23h14}}</p>
                     <!-- Affichage dynamique de la date et heure -->
                   </div>
                 </div>
@@ -96,5 +115,7 @@
         </div>
       </div>
     </div>
+    
   </div>
-</div>
+
+

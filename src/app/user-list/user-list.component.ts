@@ -6,6 +6,7 @@ import { SidebarComponent } from '../sidebar/sidebar.component';
 
 import * as bootstrap from 'bootstrap';
 import { NavComponent } from '../nav/nav.component';
+import { Router } from '@angular/router';
 
 interface User {
   prenom: string;
@@ -26,6 +27,8 @@ interface User {
   templateUrl: './user-list.component.html',
   styleUrls: ['./user-list.component.css'],
 })
+
+
 export class UserListComponent {
   showAccountForm: boolean = false;
   showPersonalInfoForm: boolean = false;
@@ -59,12 +62,25 @@ export class UserListComponent {
   totalItems: number = 0; // Nombre total d'utilisateurs
   totalPages: number = 0; // Nombre total de pages
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient,private router: Router) {}
+
+  navigateToUpdate() {
+    this.router.navigate(['/update']);
+  }
 
   ngOnInit() {
     this.getUsers(); // Charger les utilisateurs au démarrage
   }
 
+
+  editUser(user: User) {
+    // Stocker l'utilisateur à modifier
+    localStorage.setItem('userToUpdate', JSON.stringify(user));
+    // Utiliser une seule route cohérente
+    this.router.navigate(['/update']); 
+  }
+  
+  // Supprimer navigateToUpdate() car il fait double emploi
   // Méthode pour récupérer la liste des utilisateurs depuis l'API
   getUsers() {
     const token = localStorage.getItem('token'); // Récupérer le token

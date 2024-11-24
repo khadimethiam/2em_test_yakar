@@ -1,65 +1,3 @@
-.sidebar {
-  height: 100vh;
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 250px;
-  background-color: #ededf4;
-  color: black;
-  padding-top: 20px;
-  display: flex;
-  flex-direction: column;
-}
-
-.sidebar a {
-  color: black;
-  text-decoration: none;
-  padding: 15px;
-  display: block;
-  transition: background-color 0.3s ease;
-}
-
-.sidebar a:hover {
-  background-color: #8bb3f8;
-}
-
-.sidebar .logout {
-  margin-top: auto;
-  display: flex;
-  align-items: center;
-  padding: 15px;
-  background-color: #ededf4;
-  border-top: 5px solid #8bb3f8;
-  color: black;
-  text-decoration: none;
-}
-
-.sidebar .logout i {
-  margin-right: 10px;
-}
-/* Contenu principal */
-.content {
-  margin-left: 250px;
-  padding: 20px;
-}
-
-/* Header avec profil */
-.navbar {
-  border-bottom: 1px solid #dee2e6;
-  padding: 10px 20px;
-  border-radius: 20px;
-}
-
-.profile-icon {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-}
-
-.navbar-text {
-  font-weight: bold;
-}
-
 /* Cards */
 .card {
   border-radius: 15px;
@@ -85,13 +23,6 @@
   font-size: 1.1rem;
   font-weight: bold;
   color: black;
-}
-
-/* Icones */
-.icon-container {
-  font-size: 30px;
-  color: yellow;
-  margin-right: 15px;
 }
 
 /* Dégradé de couleurs pour les cards */
@@ -135,77 +66,8 @@
   box-shadow: 0 0 15px 5px #8bb3f8;
 }
 
-.navbar {
-  border-bottom: 1px solid #8bb3f8;
-  padding: 10px 20px;
-  border-radius: 20px;
-}
-.profile-icon {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-}
-.navbar-text {
-  font-weight: bold;
-}
-.navbar .profile-container {
-  display: flex;
-  align-items: center;
-  margin-left: auto;
-}
-.navbar .dark-mode-toggle {
-  cursor: pointer;
-  font-size: 1.2rem;
-  margin-right: 20px;
-  color: #333;
-}
-
-.toggle-container {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 20px;
-}
-
-.toggle-image {
-  width: 30px;
-  height: 30px;
-  margin: 0 10px;
-  cursor: pointer;
-}
-
-.toggle-switch {
-  position: relative;
-  display: inline-block;
-  width: 60px;
-  height: 34px;
-  background-color: #ccc;
-  border-radius: 34px;
-  cursor: pointer;
-}
-
-.toggle-knob {
-  position: absolute;
-  content: "";
-  height: 26px;
-  width: 26px;
-  left: 4px;
-  bottom: 4px;
-  background-color: white;
-  border-radius: 50%;
-  transition: 0.4s;
-}
-
-.toggle-switch.active {
-  background-color: #4caf50;
-}
-
-.toggle-switch.active .toggle-knob {
-  transform: translateX(26px);
-}
-
 .primary-pink {
-  background-image: url("/images/matin.jpg"); /* Remplacez par le chemin de votre image */
+  background-image: url('/images/matin.jpg'); /* Remplacez par le chemin de votre image */
   background-size: cover; /* Pour que l'image couvre toute la carte */
   background-position: center; /* Pour centrer l'image */
   background-repeat: no-repeat; /* Évite que l'image se répète */
@@ -215,7 +77,7 @@
 }
 
 .primary-purple {
-  background-image: url("/images/midi.jpg"); /* Remplacez par le chemin de votre image */
+  background-image: url('/images/midi.jpg'); /* Remplacez par le chemin de votre image */
   background-size: cover; /* Pour que l'image couvre toute la carte */
   background-position: center; /* Pour centrer l'image */
   background-repeat: no-repeat; /* Évite que l'image se répète */
@@ -225,7 +87,7 @@
 }
 
 .primary-blue {
-  background-image: url("/images/soir.jpg"); /* Remplacez par le chemin de votre image */
+  background-image: url('/images/soir.jpg'); /* Remplacez par le chemin de votre image */
   background-size: cover; /* Pour que l'image couvre toute la carte */
   background-position: center; /* Pour centrer l'image */
   background-repeat: no-repeat; /* Évite que l'image se répète */
@@ -240,8 +102,11 @@
   margin-right: 10px;
 }
 
+
+
+
 .cold-bg {
-  background-image: url("/assets/images/cold.jpg");
+  background-image: url('/assets/images/cold.jpg');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -251,7 +116,7 @@
 }
 
 .moderate-bg {
-  background-image: url("/assets/images/moderate.jpg");
+  background-image: url('/assets/images/moderate.jpg');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -261,7 +126,7 @@
 }
 
 .hot-bg {
-  background-image: url("/assets/images/hot.jpg");
+  background-image: url('/assets/images/hot.jpg');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -276,7 +141,7 @@
 }
 
 .fixed-background {
-  background-image: url("/images/moyenne.png"); /* Remplacez par le chemin de votre image */
+  background-image: url('/images/moyenne.png'); /* Remplacez par le chemin de votre image */
   background-size: cover; /* Pour couvrir tout le conteneur */
   background-position: center; /* Centrer l'image */
   background-repeat: no-repeat; /* Éviter la répétition de l'image */
@@ -285,20 +150,9 @@
   padding: 20px; /* Ajoute un espace intérieur */
 }
 
-.sidebar {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between; /* Espace entre les sections */
-  height: 100vh; /* Hauteur complète de la page */
-  padding: 20px; /* Espacement intérieur */
-  background-color: #f8f9fa; /* Exemple de fond */
-}
 
-.toggle-container {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
+
+
 
 .logout {
   text-align: center;
@@ -309,31 +163,4 @@
 
 .logout:hover {
   color: #007bff; /* Changement de couleur au survol */
-}
-
-.main-container {
-  display: flex;
-  margin-top: 60px; /* Ajustez selon la hauteur de votre nav */
-}
-
-app-sidebar {
-  width: 250px; /* Ajustez selon vos besoins */
-  height: calc(100vh - 60px); /* Ajustez selon la hauteur de votre nav */
-  position: fixed;
-  top: 60px; /* Ajustez selon la hauteur de votre nav */
-  left: 0;
-}
-
-.content {
-  margin-left: 250px; /* Ajustez selon la largeur de la sidebar */
-  padding: 20px;
-  width: calc(100% - 250px); /* Ajustez selon la largeur de la sidebar */
-}
-
-.nav {
-  position: fixed;
-  top: 0;
-  width: 100%;
-  z-index: 1000;
-  height: 60px; /* Ajustez selon la hauteur de votre nav */
 }

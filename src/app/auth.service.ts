@@ -1,6 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { HttpHeaders } from '@angular/common/http';
+
 
 @Injectable({
   providedIn: 'root',
@@ -39,4 +41,42 @@ export class AuthService {
       observer.complete();
     });
   }
+
+// Méthode pour vérifier si l'utilisateur est authentifié
+isAuthenticated(): boolean {
+  // Vérifier si un token est stocké dans le localStorage
+  return !!localStorage.getItem('token');
+}
+
+// Méthode pour récupérer le token
+getToken(): string | null {
+  return localStorage.getItem('token');
+}
+
+// Méthode pour définir le token dans le localStorage
+setToken(token: string): void {
+  localStorage.setItem('token', token);
+}
+
+// Méthode pour récupérer les informations de l'utilisateur connecté
+getUserProfile(): Observable<any> {
+const token = this.getToken();
+
+// Configuration des en-têtes avec HttpHeaders
+let headers = new HttpHeaders();
+if (token) {
+  headers = headers.set('Authorization', `Bearer ${token}`);
+}
+
+return this.http.get(`${this.apiUrl}/profile`, { headers });
+}
+
+
+  // Méthode pour vérifier le mot de passe
+  verifyPassword(oldPassword: string): Observable<any> {
+    const url = `${this.apiUrl}/users/verify-password`;  // L'endpoint de vérification du mot de passe
+    return this.http.post<any>(url, { oldPassword });
+  }
+
+
 }

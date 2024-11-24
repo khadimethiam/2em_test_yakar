@@ -1,3 +1,55 @@
+/* Navbar */
+.navbar {
+  position: fixed; /* Fixée en haut */
+  top: 0;
+  left: 250px; /* Commence après la sidebar */
+  width: calc(100% - 250px); /* Reste de la largeur de l'écran */
+  background-color: #ededf4; /* Couleur de fond */
+  padding: 10px 20px; /* Espacement intérieur */
+  border-bottom: 2px solid #8bb3f8; /* Bordure inférieure */
+  border-radius: 0 0 20px 20px; /* Coins arrondis en bas */
+  z-index: 1000; /* Toujours au-dessus des autres éléments */
+}
+
+/* Conteneur de la photo de profil et du nom d'utilisateur */
+.navbar .container-fluid {
+  display: flex;
+  justify-content: flex-end; /* Contenu aligné à droite */
+  align-items: center;
+}
+
+/* Profil utilisateur */
+.profile-photo-container {
+  display: flex;
+  align-items: center;
+}
+
+.profile-img {
+  width: 40px; /* Taille de l'image */
+  height: 40px;
+  border-radius: 50%; /* Rond */
+  margin-right: 10px; /* Espacement avec le texte */
+}
+
+/* Texte à côté de la photo */
+.navbar-text {
+  font-weight: bold; /* Texte en gras */
+  color: black; /* Couleur du texte */
+}
+
+/* Responsiveness */
+@media (max-width: 768px) {
+  .navbar {
+    left: 0;
+    width: 100%; /* Prend toute la largeur */
+  }
+
+  .sidebar {
+    width: 200px; /* Réduction de la sidebar sur petit écran */
+  }
+}
+
+
 /* Sidebar */
 .sidebar {
   height: 100vh;

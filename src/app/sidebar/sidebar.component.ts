@@ -1,33 +1,52 @@
-import { Component } from '@angular/core';
-import { RouterModule, Router } from '@angular/router'; // Importer RouterModule et Router
-import { AuthService } from '../auth.service';
+import { Component, OnInit } from '@angular/core';
+import { AuthService } from '../auth.service'; // Adaptez le chemin selon votre projet
+import { RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-sidebar',
   templateUrl: './sidebar.component.html',
   styleUrls: ['./sidebar.component.css'],
-  standalone: true,
-  imports: [RouterModule, CommonModule], // Ajouter RouterModule ici
+  standalone : true,
+  imports: [RouterModule,CommonModule]
 })
-export class SidebarComponent {
-  toggleState: boolean = false;
 
-  constructor(private authService: AuthService, private router: Router) {}
+export class SidebarComponent implements OnInit {
+  toggleState: boolean = false;
+  user: any = null; // Contiendra les données utilisateur
+
+  constructor(public authService: AuthService) {}
+
+  ngOnInit(): void {
+    // Récupération des données utilisateur
+    this.authService.getUserProfile().subscribe(
+      (data) => {
+        this.user = data;
+
+        // Ajouter l'URL complète pour la photo si elle est définie
+        if (this.user.photo) {
+          this.user.photo = `http://localhost:3000${this.user.photo}`;
+        }
+      },
+      (error) => {
+        console.error(
+          'Erreur lors de la récupération des informations utilisateur',
+          error
+        );
+      }
+    );
+  }
 
   // Fonction pour basculer l'état du toggle switch
   toggleSwitch() {
     this.toggleState = !this.toggleState;
 
-    // Récupérer l'élément toggle-switch et l'élément knob
     const toggleSwitch = document.getElementById('toggleSwitch') as HTMLElement;
     const offIcon = document.getElementById('offIcon') as HTMLImageElement;
     const onIcon = document.getElementById('onIcon') as HTMLImageElement;
 
-    // Changer la classe "active" du toggle switch pour changer la couleur et déplacer le knob
     toggleSwitch.classList.toggle('active');
 
-    // Gérer l'opacité des images
     if (this.toggleState) {
       offIcon.style.opacity = '0';
       onIcon.style.opacity = '1';
@@ -35,18 +54,5 @@ export class SidebarComponent {
       offIcon.style.opacity = '1';
       onIcon.style.opacity = '0';
     }
-  }
-
-  // Fonction pour se déconnecter
-  onLogout() {
-    this.authService.logout().subscribe(
-      () => {
-        // Rediriger vers la page de connexion après la déconnexion
-        this.router.navigate(['/login']);
-      },
-      (err) => {
-        console.error('Erreur lors de la déconnexion:', err);
-      }
-    );
   }
 }
