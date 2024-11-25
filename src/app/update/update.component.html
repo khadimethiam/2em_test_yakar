@@ -1,78 +1,152 @@
-<div *ngIf="isLoading">Chargement des données...</div>
 
-<div class="container">
-  <h1>Modification d'un utilisateur</h1>
-  <form *ngIf="!isLoading" [formGroup]="userForm" (ngSubmit)="onSubmit()">
-    <div class="form-row">
-      <div class="form-group">
-        <label for="nom">Nom</label>
-        <input type="text" id="nom" formControlName="nom" [ngClass]="{ 'is-invalid': isFieldInvalid('nom') }" placeholder="Nom"  />
-        <small class="text-danger" *ngIf="isFieldInvalid('nom')">{{ getErrorMessage('nom') }}</small>
-      </div>
-      <div class="form-group">
-        <label for="prenom">Prénom</label>
-        <input type="text" id="prenom" formControlName="prenom" placeholder="Prénom" />
-        <small class="text-danger" *ngIf="isFieldInvalid('prenom')">{{ getErrorMessage('prenom') }}</small>
-      </div>
-      <div class="form-group">
-        <label for="email">Email</label>
-        <input type="email" id="email" formControlName="email" placeholder="Email" autocomplete="off" />
-        <small class="text-danger" *ngIf="isFieldInvalid('email')">{{ getErrorMessage('email') }}</small>
-      </div>
-      <div class="form-group">
-        <label for="telephone">Téléphone</label>
-        <input type="text" id="telephone" formControlName="telephone" placeholder="Téléphone" />
-        <small class="text-danger" *ngIf="isFieldInvalid('telephone')">{{ getErrorMessage('telephone') }}</small>
-      </div>
-    </div>
 
-    <div class="form-row">
-      <div class="form-group">
-        <label for="motDePasse">Mot de passe</label>
-        <div class="password-field">
-          <input
-          type="{{passwordVisible ? 'text' : 'password'}}"
-            id="motDePasse"
-            placeholder="Laissez vide pour conserver le mot de passe actuel"
-            formControlName="motDePasse"
-          />
-          <div class="input-group-append">
-            <span class="input-group-text" (click)="togglePasswordVisibility()">
-              <i class="fas" [ngClass]="{'fa-eye': !passwordVisible, 'fa-eye-slash': passwordVisible}"></i>
-            </span>
+<app-sidebar></app-sidebar>
+
+<div class="content-wrapper container-fluid">
+  <div *ngIf="showPersonalInfoForm || showAccountForm" class="card shadow-lg mb-4 mx-auto">
+    <div class="card-body">
+      <h5 class="card-title text-center mb-4">Mettre à jour l'Utilisateur</h5>
+      <form
+        (ngSubmit)="showPersonalInfoForm ? onSubmitPersonalInfo() : onSubmitAccountInfo()"
+        #updateUserForm="ngForm"
+      >
+        <!-- Étape 1 : Informations personnelles -->
+        <div *ngIf="showPersonalInfoForm">
+          <div class="mb-3">
+            <label for="nom" class="form-label">Nom</label>
+            <input
+              type="text"
+              id="nom"
+              [(ngModel)]="userPersonalInfo.nom"
+              name="nom"
+              class="form-control"
+              placeholder="Saisir le nom"
+              required
+              #nom="ngModel"
+            />
+            <div *ngIf="nom.invalid && nom.touched" class="text-danger">
+              Le nom est requis.
+            </div>
           </div>
-          <small class="text-danger" *ngIf="isFieldInvalid('motDePasse')">{{ getErrorMessage('motDePasse') }}</small>
-        </div>
-      </div>
-      <div class="form-group">
-        <label for="role">Rôle</label>
-        <select id="role" formControlName="role">
-          <option selected disabled>Veuillez choisir un role</option>
-          <option value="admin">Admin</option>
-          <option value="simple">Utilisateur Simple</option>
-        </select>
-        <div *ngIf="userForm.get('role')?.invalid && userForm.get('role')?.touched">
-          <small class="text-danger">Le rôle est requis.</small>
-        </div>
-      </div>
-      <!-- component.html -->
-<div class="form-group">
-  <label for="photo">Photo</label>
-  <div class="custom-file">
-    <input type="file" class="custom-file-input" id="photo" formControlName="photo" (change)="onFileSelected($event)">
-    <label class="custom-file-label" for="photo-input">{{ fileName || 'Aucune image sélectionnée' }}</label>
-  </div>
-  <small class="text-danger" *ngIf="fileError">{{ fileError }}</small>
-</div>
-        
-      
-    </div>
 
-    <div class="form-actions">
-      <button type="button" class="btn btn-danger" (click)="onCancel()">Annuler</button>
-      <button type="submit" class="btn btn-primary" [disabled]="userForm.invalid">
-        Modifier
-      </button>
+          <div class="mb-3">
+            <label for="prenom" class="form-label">Prénom</label>
+            <input
+              type="text"
+              id="prenom"
+              [(ngModel)]="userPersonalInfo.prenom"
+              name="prenom"
+              class="form-control"
+              placeholder="Saisir le prénom"
+              required
+              #prenom="ngModel"
+            />
+            <div *ngIf="prenom.invalid && prenom.touched" class="text-danger">
+              Le prénom est requis.
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label for="email" class="form-label">Email</label>
+            <input
+              type="email"
+              id="email"
+              [(ngModel)]="userPersonalInfo.email"
+              name="email"
+              class="form-control"
+              placeholder="Saisir l'email"
+              required
+              email
+              #email="ngModel"
+            />
+            <div *ngIf="email.invalid && email.touched" class="text-danger">
+              Veuillez saisir une adresse email valide.
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label for="numero_tel" class="form-label">Numéro de Téléphone</label>
+            <input
+              type="tel"
+              id="numero_tel"
+              [(ngModel)]="userPersonalInfo.numero_tel"
+              name="numero_tel"
+              class="form-control"
+              placeholder="Ex: 770123456"
+              required
+              pattern="^[0-9]{9}$"
+              #numero_tel="ngModel"
+            />
+            <div *ngIf="numero_tel.invalid && numero_tel.touched" class="text-danger">
+              Numéro invalide (9 chiffres requis).
+            </div>
+          </div>
+        </div>
+
+        <!-- Étape 2 : Informations de compte -->
+        <div *ngIf="showAccountForm">
+          <div class="mb-3">
+            <label for="oldPassword" class="form-label">Ancien Mot de Passe</label>
+            <div class="input-group">
+              <input
+                type="{{ showPassword ? 'text' : 'password' }}"
+                id="oldPassword"
+                [(ngModel)]="userAccountInfo.oldPassword"
+                name="oldPassword"
+                class="form-control"
+                placeholder="Ancien mot de passe"
+                required
+                #oldPassword="ngModel"
+              />
+              <span class="input-group-text" (click)="togglePasswordVisibility()">
+                <i class="bi" [ngClass]="showPassword ? 'bi-eye-slash' : 'bi-eye'"></i>
+              </span>
+            </div>
+            <div *ngIf="oldPassword.invalid && oldPassword.touched" class="text-danger">
+              L'ancien mot de passe est requis.
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label for="password" class="form-label">Nouveau Mot de Passe</label>
+            <div class="input-group">
+              <input
+                type="{{ showPassword ? 'text' : 'password' }}"
+                id="password"
+                [(ngModel)]="userAccountInfo.password"
+                name="password"
+                class="form-control"
+                placeholder="Nouveau mot de passe"
+                required
+                minlength="6"
+                #password="ngModel"
+              />
+              <span class="input-group-text" (click)="togglePasswordVisibility()">
+                <i class="bi" [ngClass]="showPassword ? 'bi-eye-slash' : 'bi-eye'"></i>
+              </span>
+            </div>
+            <div *ngIf="password.invalid && password.touched" class="text-danger">
+              Le mot de passe doit avoir au moins 6 caractères.
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label for="photo" class="form-label">Photo</label>
+            <input type="file" id="photo" (change)="onFileChange($event)" class="form-control" />
+          </div>
+        </div>
+
+        <div class="d-flex justify-content-between">
+          <button type="button" class="btn btn-danger btn-sm" (click)="cancel()">Annuler</button>
+          <button
+            type="submit"
+            class="btn btn-primary btn-sm"
+            [disabled]="updateUserForm.invalid"
+          >
+            {{ showPersonalInfoForm ? 'Suivant' : 'Enregistrer' }}
+          </button>
+        </div>
+      </form>
     </div>
-  </form>
+  </div>
 </div>

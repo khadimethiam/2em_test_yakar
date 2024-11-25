@@ -1,65 +1,3 @@
-.sidebar {
-  height: 100vh;
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 250px;
-  background-color: #ededf4;
-  color: black;
-  padding-top: 20px;
-  display: flex;
-  flex-direction: column;
-}
-
-.sidebar a {
-  color: black;
-  text-decoration: none;
-  padding: 15px;
-  display: block;
-  transition: background-color 0.3s ease;
-}
-
-.sidebar a:hover {
-  background-color: #8bb3f8;
-}
-
-.sidebar .logout {
-  margin-top: auto;
-  display: flex;
-  align-items: center;
-  padding: 15px;
-  background-color: #ededf4;
-  border-top: 5px solid #8bb3f8;
-  color: black;
-  text-decoration: none;
-}
-
-.sidebar .logout i {
-  margin-right: 10px;
-}
-/* Contenu principal */
-.content {
-  margin-left: 250px;
-  padding: 20px;
-}
-
-/* Header avec profil */
-.navbar {
-  border-bottom: 1px solid #dee2e6;
-  padding: 10px 20px;
-  border-radius: 20px;
-}
-
-.profile-icon {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-}
-
-.navbar-text {
-  font-weight: bold;
-}
-
 /* Cards */
 .card {
   border-radius: 15px;
@@ -87,22 +25,18 @@
   color: black;
 }
 
-/* Icones */
-.icon-container {
-  font-size: 30px;
-  color: yellow;
-  margin-right: 15px;
+/* Dégradé de couleurs pour les cards */
+.card.primary-white {
+  background: linear-gradient(135deg, #ededf6); /* Pink + Primary Pink */
+  border: none;
+  box-shadow: 0 0 10px 5px #8bb3f8;
 }
 
 /* Dégradé de couleurs pour les cards */
 .card.primary-blue {
-  background: linear-gradient(
-    135deg,
-    #e17cfd,
-    #8bb3f8,
-    #ff69b4
-  ); /* Bleu + Primary Blue */
+  background: linear-gradient(135deg, #ededf6); /* Pink + Primary Pink */
   border: none;
+  box-shadow: 0 0 10px 5px #8bb3f8;
 }
 
 .card.primary-pink {
@@ -128,75 +62,111 @@
 .bottom-card {
   width: 100%;
   background: linear-gradient(135deg, #ededf6); /* Pink + Primary Pink */
-  border: 2px solid #6d92d0;
+  border: 1px solid #6d92d0;
   box-shadow: 0 0 15px 5px #8bb3f8;
+  bottom: 119%;
+
 }
 
-.navbar {
-  border-bottom: 1px solid #8bb3f8;
-  padding: 10px 20px;
-  border-radius: 20px;
-}
-.profile-icon {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-}
-.navbar-text {
-  font-weight: bold;
-}
-.navbar .profile-container {
-  display: flex;
-  align-items: center;
-  margin-left: auto;
-}
-.navbar .dark-mode-toggle {
-  cursor: pointer;
-  font-size: 1.2rem;
-  margin-right: 20px;
-  color: #333;
+.primary-pink {
+  background-image: url('/images/matin.jpg'); /* Remplacez par le chemin de votre image */
+  background-size: cover; /* Pour que l'image couvre toute la carte */
+  background-position: center; /* Pour centrer l'image */
+  background-repeat: no-repeat; /* Évite que l'image se répète */
+  border-radius: 10px; /* Optionnel : ajoute un effet arrondi */
+  color: #fff; /* Ajuste le texte pour qu'il soit lisible */
+  padding: 20px; /* Optionnel : espace intérieur */
 }
 
-.toggle-container {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 20px;
+.primary-purple {
+  background-image: url('/images/midi.jpg'); /* Remplacez par le chemin de votre image */
+  background-size: cover; /* Pour que l'image couvre toute la carte */
+  background-position: center; /* Pour centrer l'image */
+  background-repeat: no-repeat; /* Évite que l'image se répète */
+  border-radius: 10px; /* Optionnel : ajoute un effet arrondi */
+  color: #fff; /* Ajuste le texte pour qu'il soit lisible */
+  padding: 20px; /* Optionnel : espace intérieur */
 }
 
-.toggle-image {
-  width: 30px;
-  height: 30px;
-  margin: 0 10px;
-  cursor: pointer;
+.primary-blue {
+  background-image: url('/images/soir.jpg'); /* Remplacez par le chemin de votre image */
+  background-size: cover; /* Pour que l'image couvre toute la carte */
+  background-position: center; /* Pour centrer l'image */
+  background-repeat: no-repeat; /* Évite que l'image se répète */
+  border-radius: 10px; /* Optionnel : ajoute un effet arrondi */
+  color: #fff; /* Ajuste le texte pour qu'il soit lisible */
+  padding: 20px; /* Optionnel : espace intérieur */
 }
 
-.toggle-switch {
-  position: relative;
-  display: inline-block;
-  width: 60px;
-  height: 34px;
-  background-color: #ccc;
-  border-radius: 34px;
-  cursor: pointer;
+.temperature-icon {
+  width: 50px;
+  height: 50px;
+  margin-right: 10px;
 }
 
-.toggle-knob {
-  position: absolute;
-  content: "";
-  height: 26px;
-  width: 26px;
-  left: 4px;
-  bottom: 4px;
-  background-color: white;
-  border-radius: 50%;
-  transition: 0.4s;
+
+
+
+.cold-bg {
+  background-image: url('/assets/images/cold.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  border-radius: 10px;
+  color: #fff;
+  padding: 20px;
 }
 
-.toggle-switch.active {
-  background-color: #4caf50;
+.moderate-bg {
+  background-image: url('/assets/images/moderate.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  border-radius: 10px;
+  color: #fff;
+  padding: 20px;
 }
 
-.toggle-switch.active .toggle-knob {
-  transform: translateX(26px);
+.hot-bg {
+  background-image: url('/assets/images/hot.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  border-radius: 10px;
+  color: #fff;
+  padding: 20px;
+}
+
+.default {
+  background-color: #f5f5f5; /* Fond neutre par défaut */
+  color: #000;
+}
+
+.fixed-background {
+  background-image: url('/images/moyenne.png'); /* Remplacez par le chemin de votre image */
+  background-size: cover; /* Pour couvrir tout le conteneur */
+  background-position: center; /* Centrer l'image */
+  background-repeat: no-repeat; /* Éviter la répétition de l'image */
+  border-radius: 10px; /* Bords arrondis */
+  color: #fff; /* Couleur de texte adaptée */
+  padding: 20px; /* Ajoute un espace intérieur */
+}
+
+
+
+
+
+.logout {
+  text-align: center;
+  margin-top: 10px;
+  color: #333; /* Couleur du texte */
+  text-decoration: none; /* Supprimer le soulignement */
+}
+
+.logout:hover {
+  color: #007bff; /* Changement de couleur au survol */
+}
+.container , h2 {
+
+  text-align: center;
 }

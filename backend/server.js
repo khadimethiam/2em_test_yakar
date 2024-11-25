@@ -6,7 +6,11 @@ const bodyParser = require("body-parser");
 const bcrypt = require("bcryptjs");
 const cors = require("cors");
 const jwt = require("jsonwebtoken");
+const multer = require("multer");
+const path = require("path");
 const { SerialPort, ReadlineParser } = require("serialport");
+const { Request, Response } = require('express');
+
 
 const app = express();
 const server = http.createServer(app);
@@ -16,34 +20,113 @@ const io = socketIo(server, {
   },
 });
 
+// Configuration CORS pour permettre les connexions depuis n'importe où
+const corsOptions = {
+  origin: "http://localhost:4200", // URL de votre frontend Angular
+  methods: "GET,POST,PUT,DELETE",
+  allowedHeaders: "Content-Type,Authorization",
+};
+app.use(cors(corsOptions));
 
+// Middleware pour parser les données JSON
 app.use(bodyParser.json());
-app.use(cors());
+
+// Middleware pour servir les fichiers d'images téléchargées depuis le dossier "uploads"
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // Connexion à MongoDB
 mongoose
-  .connect("mongodb://localhost:27017/test_yakar", {
+  .connect("mongodb://localhost:27017/Projet_Angular", {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   })
   .then(() => console.log("Connexion à MongoDB réussie"))
   .catch((err) => console.error("Erreur de connexion à MongoDB:", err));
 
-// Modèle Utilisateur
+// Configuration de Multer pour gérer les fichiers téléchargés (photos)
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "../public/images/profil"); // Dossier où les fichiers seront stockés
+  },
+  filename: (req, file, cb) => {
+    cb(null, `${Date.now()}-${file.originalname}`); // Nom unique du fichier
+  },
+});
+
+const upload = multer({ storage });
+
+// Modèle Utilisateur avec statut et photo
 const UserSchema = new mongoose.Schema({
-  nom: String,
-  prenom: String,
+  nom: { type: String, required: true },
+  prenom: { type: String, required: true },
   email: { type: String, unique: true, required: true },
-  numero_tel: { type: String, unique: true, required: true, match: /^(70|75|76|77|78)\d{7}$/ },
-  mot_de_passe: { type: String, minlength: 8 },
-  code_authentification: String,
+  numero_tel: { type: String, unique: true, required: true },
+  mot_de_passe: { type: String, required: true },
+  code_authentification: { type: String, required: true },
   role: { type: String, enum: ["admin", "user"], required: true },
+  status: { type: String, enum: ["actif", "inactif"], default: "actif" }, // Définir "actif" comme valeur par défaut
+  photo: { type: String }, // Chemin vers l'image téléchargée
 });
 
 const User = mongoose.model("User", UserSchema);
 
-// Route d'inscription
-app.post("/register", async (req, res) => {
+// Middleware d'authentification (Vérification JWT)
+const authenticate = (req, res, next) => {
+  const token = req.headers.authorization?.split(" ")[1];
+
+  if (!token) {
+    return res.status(403).json({ message: "Accès interdit, token manquant" });
+  }
+
+  try {
+    const decoded = jwt.verify(token, "secret_key");
+    req.userId = decoded.userId;
+    req.role = decoded.role;
+
+    // Vérifier si l'utilisateur a le rôle 'admin'
+    if (req.role !== "admin") {
+      return res
+        .status(403)
+        .json({ message: "Accès interdit, administrateur uniquement" });
+    }
+
+    next();
+  } catch (err) {
+    return res.status(401).json({ message: "Token invalide" });
+  }
+};
+
+// Route de mise à jour du rôle de l'utilisateur (avec authentification)
+app.put("/api/users/:id/role", authenticate, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { role } = req.body;
+
+    // Vérification du rôle avant mise à jour
+    if (!["admin", "user"].includes(role)) {
+      return res
+        .status(400)
+        .json({ message: "Rôle invalide. Choisissez entre 'admin' et 'user'" });
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(
+      id,
+      { role },
+      { new: true }
+    );
+    if (!updatedUser) {
+      return res.status(404).json({ message: "Utilisateur non trouvé" });
+    }
+
+    res.status(200).json(updatedUser);
+  } catch (err) {
+    console.error("Erreur lors de la mise à jour du rôle:", err);
+    res.status(500).json({ message: "Erreur lors de la mise à jour du rôle" });
+  }
+});
+
+// Route d'inscription avec photo
+app.post("/register", upload.single("photo"), async (req, res) => {
   try {
     const { nom, prenom, email, numero_tel, mot_de_passe, role } = req.body;
 
@@ -60,6 +143,8 @@ app.post("/register", async (req, res) => {
     ).toString();
     const hashedPassword = await bcrypt.hash(mot_de_passe, 10);
 
+    const photo = req.file ? req.file.path : null;
+
     const newUser = new User({
       nom,
       prenom,
@@ -68,6 +153,7 @@ app.post("/register", async (req, res) => {
       mot_de_passe: hashedPassword,
       code_authentification,
       role,
+      photo,
     });
 
     await newUser.save();
@@ -151,6 +237,15 @@ app.post("/login", async (req, res) => {
         .json({ message: "Email ou mot de passe incorrect" });
     }
 
+    if (user.status === "inactif") {
+      return res
+        .status(403)
+        .json({
+          message:
+            "Votre compte est inactif. Veuillez contacter l'administrateur.",
+        });
+    }
+
     const isMatch = await bcrypt.compare(mot_de_passe, user.mot_de_passe);
 
     if (!isMatch) {
@@ -183,6 +278,15 @@ app.post("/login-code", async (req, res) => {
         .json({ message: "Code d'authentification incorrect" });
     }
 
+    if (user.status === "inactif") {
+      return res
+        .status(403)
+        .json({
+          message:
+            "Votre compte est inactif. Veuillez contacter l'administrateur.",
+        });
+    }
+
     const token = jwt.sign(
       { userId: user._id, role: user.role },
       "secret_key",
@@ -197,52 +301,72 @@ app.post("/login-code", async (req, res) => {
   }
 });
 
-
-// Obtenir un utilisateur par ID
-app.get("/user/edit/:id", async (req, res) => {
+// Route pour vérifier si un utilisateur existe
+app.get("/check-user-exists", async (req, res) => {
   try {
-    const user = await User.findById(req.params.id);
-    if (!user) {
-      return res.status(404).json({ message: 'Utilisateur non trouvé' });
+    const { email } = req.query;
+    const user = await User.findOne({ email });
+
+    if (user) {
+      res.status(200).json({ exists: true });
+    } else {
+      res.status(200).json({ exists: false });
     }
-    res.json(user);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
+  } catch (err) {
+    console.error("Erreur lors de la vérification de l'utilisateur:", err);
+    res
+      .status(500)
+      .json({ message: "Erreur lors de la vérification de l'utilisateur" });
   }
 });
 
-// Fonction pour hacher un mot de passe
-const hashPassword = async (plainPassword) => {
+// Route de mise à jour du statut de l'utilisateur (avec authentification)
+app.put("/api/users/:id/status", authenticate, async (req, res) => {
   try {
-    const saltRounds = 10; // Nombre de rounds pour générer le sel
-    const hashedPassword = await bcrypt.hash(plainPassword, saltRounds);
-    return hashedPassword;
-  } catch (error) {
-    console.error("Erreur lors du hachage du mot de passe :", error);
-    throw error;
+    const { id } = req.params;
+    const { status } = req.body;
+
+    // Vérification si le statut est valide
+    if (!["actif", "inactif"].includes(status)) {
+      return res.status(400).json({
+        message: "Statut invalide. Choisissez entre 'actif' et 'inactif'",
+      });
+    }
+
+    // Mettre à jour le statut de l'utilisateur
+    const updatedUser = await User.findByIdAndUpdate(
+      id,
+      { status },
+      { new: true }
+    );
+    if (!updatedUser) {
+      return res.status(404).json({ message: "Utilisateur non trouvé" });
+    }
+
+    res.status(200).json(updatedUser);
+  } catch (err) {
+    console.error("Erreur lors de la mise à jour du statut:", err);
+    res
+      .status(500)
+      .json({ message: "Erreur lors de la mise à jour du statut" });
   }
-};
+});
 
-// Exemple d'utilisation dans une route Express
-
-
-app.post('/hash-password', async (req, res) => {
-  const { password } = req.body;
-
-  if (!password) {
-    return res.status(400).json({ error: 'Mot de passe requis' });
-  }
-
+// Route pour récupérer tous les utilisateurs (uniquement accessible par les administrateurs)
+app.get("/api/users", authenticate, async (req, res) => {
   try {
-    const hashedPassword = await hashPassword(password);
-    res.status(200).json({ hashedPassword });
-  } catch (error) {
-    res.status(500).json({ error: 'Erreur lors du hachage du mot de passe' });
+    const users = await User.find(); // Récupère tous les utilisateurs
+    res.status(200).json(users);
+  } catch (err) {
+    console.error("Erreur lors de la récupération des utilisateurs:", err);
+    res
+      .status(500)
+      .json({ message: "Erreur lors de la récupération des utilisateurs" });
   }
 });
 
 // Configuration du port série pour lire les données du keypad
-const portPath = "COM4"; // Remplacez 'COM4' par le port série de votre Arduino
+/*const portPath = "COM4"; // Remplacez 'COM4' par le port série de votre Arduino
 if (!portPath) {
   console.error("Le chemin du port série n'est pas défini");
   process.exit(1);
@@ -263,9 +387,73 @@ parser.on("data", (data) => {
   console.log("Données du keypad reçues:", data);
   // Envoyer les données du keypad à tous les clients connectés
   io.emit("keypad-input", data);
-});
+});*/
 
 // Démarrage du serveur
 server.listen(3000, () => {
   console.log("Serveur démarré sur le port 3000");
+});
+
+
+// Route pour mettre à jour les informations de l'utilisateur (y compris la photo)
+app.put("/users/:id", authenticate, upload.single("photo"), async (req, res) => {
+  try {
+    const id = req.params.id;
+    const updates = req.body;
+
+    // Ajout de la gestion du fichier photo
+    if (req.file) {
+      updates.photo = req.file.path;  // Assurez-vous que le chemin est correct
+    }
+
+    // Mise à jour de l'utilisateur dans la base de données
+    const updatedUser = await User.findByIdAndUpdate(id, updates, { new: true });
+
+    if (!updatedUser) {
+      return res.status(404).send("Utilisateur non trouvé");
+    }
+
+    res.status(200).json({ message: "Mise à jour réussie", user: updatedUser });
+  } catch (err) {
+    console.error("Erreur lors de la mise à jour :", err);
+    res.status(500).send("Erreur serveur");
+  }
+});
+
+
+app.post("/users/verify-password", authenticate, async (req, res) => {
+  try {
+    const { userId, oldPassword } = req.body;
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({ message: "Utilisateur non trouvé" });
+    }
+
+    // Vérification du mot de passe actuel
+    const isMatch = await bcrypt.compare(oldPassword, user.mot_de_passe);
+    if (!isMatch) {
+      return res.status(400).json({ message: "Ancien mot de passe incorrect" });
+    }
+
+    res.status(200).json({ message: "Ancien mot de passe valide" });
+  } catch (err) {
+    console.error("Erreur lors de la vérification du mot de passe:", err);
+    res.status(500).json({ message: "Erreur serveur" });
+  }
+});
+
+
+
+
+// 3. Déconnexion
+app.post("/logout", authenticate, (req, res) => {
+  const token = req.headers.authorization?.split(" ")[1];
+
+  if (token) {
+    // Ajoutez le token à la liste des tokens invalidés
+    invalidatedTokens.add(token);
+  }
+
+  res.status(200).json({ message: "Déconnexion réussie" });
 });
