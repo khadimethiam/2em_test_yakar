@@ -61,7 +61,7 @@ function getDayOfWeek() {
 }
 
 /*const arduinoPort = new SerialPort({
-  path: "COM3",
+  path: "/dev/ttyUSB0",
   baudRate: 9600,
 });*/
 
@@ -118,9 +118,9 @@ async function saveDataToDB(hour) {
 
 // Heures spécifiques à surveiller
 let dataForSpecificHours = {
-  "16h28": { temperature: null, humidity: null },
-  "16h29": { temperature: null, humidity: null },
-  "16h30": { temperature: null, humidity: null },
+  "09h53": { temperature: null, humidity: null },
+  "09h54": { temperature: null, humidity: null },
+  "09h55": { temperature: null, humidity: null },
 };
 
 function checkAndSaveData() {
@@ -201,7 +201,7 @@ async function calculateAndSaveDailyAverages() {
 // Planification du calcul et de l'enregistrement des moyennes 5 minutes après la dernière heure de collecte (12h05)
 setInterval(() => {
   const now = new Date();
-  if (now.getHours() === 16 && now.getMinutes() === 31) {
+  if (now.getHours() === 9 && now.getMinutes() === 58) {
     calculateAndSaveDailyAverages();
   }
 }, 60000);
@@ -216,7 +216,7 @@ app.post("/api/data/save", async (req, res) => {
   }
 });
 
-const specificHoursRoutes = ["16h28", "16h29", "16h30"];
+const specificHoursRoutes = ["09h53", "09h54", "09h55"];
 
 specificHoursRoutes.forEach((hour) => {
   app.get(`/api/data/${hour}`, async (req, res) => {

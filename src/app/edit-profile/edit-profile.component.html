@@ -1,0 +1,48 @@
+<!-- edit-profile.component.html -->
+<div class="modal">
+    <div class="modal-content">
+      <h2>Modifier mon profil</h2>
+      <form [formGroup]="editProfileForm" (ngSubmit)="onSubmit()">
+        <div class="profile-photo-upload">
+          <img 
+            [src]="previewImage || 'assets/default-profile.png'" 
+            class="profile-preview"
+          >
+          <input 
+            type="file" 
+            (change)="onFileSelected($event)"
+            accept="image/*"
+            id="photoUpload"
+          >
+          <label for="photoUpload" class="upload-button">Changer la photo</label>
+        </div>
+  
+        <div class="form-group">
+          <label for="nom">Nom</label>
+          <input type="text" id="nom" formControlName="nom" required>
+        </div>
+  
+        <div class="form-group">
+          <label for="prenom">Prénom</label>
+          <input type="text" id="prenom" formControlName="prenom" required>
+        </div>
+  
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input type="email" id="email" formControlName="email" required>
+        </div>
+  
+        <div class="form-group">
+          <label for="numero_tel">Numéro de téléphone</label>
+          <input type="tel" id="numero_tel" formControlName="numero_tel" required>
+        </div>
+  
+        <div class="modal-actions">
+          <button type="submit" [disabled]="!editProfileForm.valid">
+            Enregistrer les modifications
+          </button>
+          <button type="button">Annuler</button>
+        </div>
+      </form>
+    </div>
+  </div>

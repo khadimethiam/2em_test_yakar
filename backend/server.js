@@ -80,11 +80,10 @@ const authenticate = (req, res, next) => {
 
   try {
     const decoded = jwt.verify(token, "secret_key");
-    req.userId = decoded.userId;
-    req.role = decoded.role;
+    req.user = { userId: decoded.userId, role: decoded.role }; // Corrigé
 
     // Vérifier si l'utilisateur a le rôle 'admin'
-    if (req.role !== "admin") {
+    if (decoded.role !== "admin") {
       return res
         .status(403)
         .json({ message: "Accès interdit, administrateur uniquement" });
@@ -95,6 +94,7 @@ const authenticate = (req, res, next) => {
     return res.status(401).json({ message: "Token invalide" });
   }
 };
+
 
 // Route de mise à jour du rôle de l'utilisateur (avec authentification)
 app.put("/api/users/:id/role", authenticate, async (req, res) => {
@@ -205,6 +205,29 @@ app.post("/login", async (req, res) => {
   }
 });
 
+// Route pour récupérer les informations de l'utilisateur connecté
+app.get("/profile", authenticate, async (req, res) => {
+  try {
+    const user = await User.findById(req.user.userId).select("nom prenom photo"); // Corrigé
+
+    if (!user) {
+      return res.status(404).json({ message: "Utilisateur non trouvé" });
+    }
+
+    const profile = {
+      nom: user.nom,
+      prenom: user.prenom,
+      photo: user.photo ? `/uploads/${user.photo}` : null,
+    };
+
+    res.status(200).json(profile);
+  } catch (err) {
+    console.error("Erreur lors de la récupération du profil :", err);
+    res.status(500).json({ message: "Erreur serveur" });
+  }
+});
+
+
 // Route d'authentification avec le code généré
 app.post("/login-code", async (req, res) => {
   try {
@@ -305,7 +328,7 @@ app.get("/api/users", authenticate, async (req, res) => {
 });
 
 // Configuration du port série pour lire les données du keypad
-/*const portPath = "COM4"; // Remplacez 'COM4' par le port série de votre Arduino
+/*const portPath = "/dev/ttyUSB0"; // Remplacez 'COM4' par le port série de votre Arduino
 if (!portPath) {
   console.error("Le chemin du port série n'est pas défini");
   process.exit(1);
@@ -326,12 +349,9 @@ parser.on("data", (data) => {
   console.log("Données du keypad reçues:", data);
   // Envoyer les données du keypad à tous les clients connectés
   io.emit("keypad-input", data);
-});*/
+}); */
 
-// Démarrage du serveur
-server.listen(3000, () => {
-  console.log("Serveur démarré sur le port 3000");
-});
+
 
 
 // Route pour mettre à jour les informations de l'utilisateur (y compris la photo)
@@ -395,4 +415,31 @@ app.post("/logout", authenticate, (req, res) => {
   }
 
   res.status(200).json({ message: "Déconnexion réussie" });
+});
+
+// Route pour récupérer tous les utilisateurs avec le rôle "admin"
+app.get("/api/users/admin", authenticate, async (req, res) => {
+  try {
+    const admins = await User.find({ role: "admin" });
+    res.status(200).json(admins);
+  } catch (err) {
+    console.error("Erreur lors de la récupération des administrateurs :", err);
+    res.status(500).json({ message: "Erreur lors de la récupération des administrateurs" });
+  }
+});
+
+// Route pour récupérer tous les utilisateurs avec le rôle "user"
+app.get("/api/users/user", authenticate, async (req, res) => {
+  try {
+    const users = await User.find({ role: "user" });
+    res.status(200).json(users);
+  } catch (err) {
+    console.error("Erreur lors de la récupération des utilisateurs :", err);
+    res.status(500).json({ message: "Erreur lors de la récupération des utilisateurs" });
+  }
+});
+
+// Démarrage du serveur
+server.listen(3000, () => {
+  console.log("Serveur démarré sur le port 3000");
 });

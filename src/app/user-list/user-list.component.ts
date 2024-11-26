@@ -39,6 +39,7 @@ export class UserListComponent {
   selectedUser: User | null = null; // Utilisateur sélectionné pour bloquer ou modifier
   searchPhone: string = ''; // Valeur du champ de recherche par numéro de téléphone
   showPassword = false; // Par défaut, le mot de passe est masqué
+  displayedUsers: User[] = [];
 
   userPersonalInfo: User = {
     nom: '',
@@ -80,7 +81,7 @@ export class UserListComponent {
     this.router.navigate(['/update']); 
   }
   
-  // Supprimer navigateToUpdate() car il fait double emploi
+ 
   // Méthode pour récupérer la liste des utilisateurs depuis l'API
   getUsers() {
     const token = localStorage.getItem('token'); // Récupérer le token
@@ -109,25 +110,21 @@ export class UserListComponent {
 
   // Filtrer les utilisateurs en fonction de leur rôle
   filterUsers(role: string) {
-    // Filtrer les utilisateurs en fonction du rôle sélectionné
     if (role === 'user') {
       this.filteredUsers = this.users.filter((user) => user.role === 'user');
     } else if (role === 'admin') {
       this.filteredUsers = this.users.filter((user) => user.role === 'admin');
     } else {
-      this.filteredUsers = this.users; // Affiche tous les utilisateurs si aucun filtre n'est appliqué
+      this.filteredUsers = [...this.users]; // Réinitialise aux utilisateurs complets
     }
-
-    // Met à jour le nombre total d'éléments filtrés et recalcule le nombre de pages
+  
+    // Mise à jour de la pagination
     this.totalItems = this.filteredUsers.length;
-    this.totalPages = Math.ceil(this.totalItems / this.itemsPerPage); // Recalculer totalPages après le filtrage
-
-    // Remise à zéro de la pagination pour commencer à partir de la première page après filtrage
-    this.currentPage = 1;
-
-    // Appliquer la pagination après avoir mis à jour les utilisateurs filtrés
-    this.paginateUsers();
+    this.totalPages = Math.ceil(this.totalItems / this.itemsPerPage);
+    this.currentPage = 1; // Revenir à la première page après un changement de filtre
+    this.paginateUsers(); // Appliquer la pagination sur les utilisateurs filtrés
   }
+  
 
   // Gérer la pagination et afficher les utilisateurs de la page actuelle
   paginateUsers() {
@@ -136,7 +133,7 @@ export class UserListComponent {
       startIndex,
       startIndex + this.itemsPerPage
     );
-    this.users = paginated; // Met à jour la liste des utilisateurs affichés
+    this.displayedUsers = paginated; // Utilisez une nouvelle variable pour afficher les utilisateurs
   }
 
   // Naviguer vers une page spécifique
