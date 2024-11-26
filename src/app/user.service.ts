@@ -29,7 +29,18 @@ export class UserService {
 
     return this.http.get<any[]>(this.apiUrl, { headers });
   }
-  
+
+  // Obtenir les utilisateurs ayant un rôle spécifique (par exemple 'user' ou 'admin')
+  getUsersByRole(role: string): Observable<any[]> {
+    const token = localStorage.getItem('token'); // Récupérer le token
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}` // Ajouter le token à l'en-tête
+    });
+
+    // URL modifiée pour filtrer par rôle
+    return this.http.get<any[]>(`${this.apiUrl}/${role}`, { headers });
+  }
+
   // Mettre à jour un utilisateur
   updateUser(userId: string, user: any): Observable<any> {
     const token = localStorage.getItem('token'); // Récupérer le token

@@ -209,6 +209,40 @@ app.get("/api/users", authenticate, async (req, res) => {
   }
 });
 
+// Route pour récupérer tous les utilisateurs ayant le rôle 'user' (uniquement accessible par les administrateurs)
+app.get("/api/users/user", authenticate, async (req, res) => {
+  try {
+    // Vérifier que l'utilisateur est administrateur
+    if (req.role !== 'admin') {
+      return res.status(403).json({ message: "Accès interdit, administrateur uniquement" });
+    }
+
+    const users = await User.find({ role: 'user' }); // Récupère les utilisateurs avec le rôle 'user'
+    res.status(200).json(users);
+  } catch (err) {
+    console.error("Erreur lors de la récupération des utilisateurs 'user':", err);
+    res.status(500).json({ message: "Erreur lors de la récupération des utilisateurs" });
+  }
+});
+
+// Route pour récupérer tous les utilisateurs ayant le rôle 'admin' (uniquement accessible par les administrateurs)
+app.get("/api/users/admin", authenticate, async (req, res) => {
+  try {
+    // Vérifier que l'utilisateur est administrateur
+    if (req.role !== 'admin') {
+      return res.status(403).json({ message: "Accès interdit, administrateur uniquement" });
+    }
+
+    const admins = await User.find({ role: 'admin' }); // Récupère les utilisateurs avec le rôle 'admin'
+    res.status(200).json(admins);
+  } catch (err) {
+    console.error("Erreur lors de la récupération des utilisateurs 'admin':", err);
+    res.status(500).json({ message: "Erreur lors de la récupération des utilisateurs" });
+  }
+});
+
+
+
 // Démarrage du serveur
 server.listen(3000, () => {
   console.log("Serveur démarré sur le port 3000");
