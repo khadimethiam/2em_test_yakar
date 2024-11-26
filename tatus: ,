@@ -1,0 +1,61 @@
+[33mcommit 115f72d59a3e7abb182fc46dc2c713d6d208b093[m[33m ([m[1;36mHEAD -> [m[1;32mCRUD[m[33m, [m[1;31morigin/CRUD[m[33m)[m
+Merge: 3db07fd 2e8fd29
+Author: niassy1903 <niassy.lamine10@gmail.com>
+Date:   Tue Nov 26 23:47:49 2024 +0000
+
+    recuereration du travail de moustapha sur le CRUD
+
+[33mcommit 2e8fd29201ec12abf38ff1f1dcdb8afd1fe9159b[m[33m ([m[1;31morigin/Restruction[m[33m, [m[1;32mRestruction[m[33m)[m
+Author: niassy1903 <niassy.lamine10@gmail.com>
+Date:   Tue Nov 26 20:13:50 2024 +0000
+
+    correction des retours à savoir le dahsbord et laffichage du nom + prenom au niveau du sidebae
+
+[33mcommit 3db07fd75f1de495d9f08b26f33614a0b9af058d[m
+Author: thecrackmandieng <moustaphadieng0405@gmail.com>
+Date:   Tue Nov 26 19:11:24 2024 +0000
+
+     les mise a jour et les retour
+
+[33mcommit 63871619297ff4228614c0f87e75fa0cdacfee1f[m
+Author: niassy1903 <niassy.lamine10@gmail.com>
+Date:   Sun Nov 24 22:20:53 2024 +0000
+
+    dernier mise à jour
+
+[33mcommit d809a719a7c270630f604eeeefc686d9f4960613[m
+Author: niassy1903 <niassy.lamine10@gmail.com>
+Date:   Sun Nov 24 16:47:23 2024 +0000
+
+    mettre à jour
+
+[33mcommit da5f67eb1fd65db75dfd4d00340d82fffc183e0b[m
+Author: niassy1903 <niassy.lamine10@gmail.com>
+Date:   Sun Nov 24 14:57:20 2024 +0000
+
+    dernier mise à jour
+
+[33mcommit eae49726679daaa1379eadf6cb268a31652f74ce[m[33m ([m[1;31morigin/booolé[m[33m, [m[1;32mbooolé[m[33m)[m
+Author: khadimethiam <thiamkhadim154@gmail.com>
+Date:   Sun Nov 24 00:58:58 2024 +0000
+
+    boolé
+
+[33mcommit 055b0a2bf0904b77314596a7bed3e20eaeaed335[m
+Author: thecrackmandieng <moustaphadieng0405@gmail.com>
+Date:   Fri Nov 22 18:48:46 2024 +0000
+
+    jai terminer l'ajout, le blocage deblocage, changement de role et la liste
+
+[33mcommit fae22d07ebdd5c961bec83259c01aa301eff9c1c[m[33m ([m[1;31morigin/bamba_2.0[m[33m, [m[1;31morigin/auth_yakar[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mauth_yakar[m[33m)[m
+Author: khadimethiam <thiamkhadim154@gmail.com>
+Date:   Fri Nov 15 16:43:56 2024 +0000
+
+    initial commit
+    le debut
+
+[33mcommit 3097d335de6f7ee786f69257264d9a7418955e49[m[33m ([m[1;31morigin/auth_2.0[m[33m)[m
+Author: khadimethiam <thiamkhadim154@gmail.com>
+Date:   Wed Nov 13 18:23:45 2024 +0000
+
+    initial commit
