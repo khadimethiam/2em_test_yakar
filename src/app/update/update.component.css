@@ -1,0 +1,96 @@
+/* Style global pour la page */
+.content-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    margin-top: 20px; /* Espacement au-dessus */
+    padding: 20px;
+    width: 100%;
+  }
+  
+  /* Centrer la section contenant le formulaire */
+  .card {
+    background-color: #d1d2d3; /* Fond gris clair pour la carte */
+    border-radius: 30px; /* Coins arrondis de la carte */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5); /* Ombre portée */
+    width: 100%;
+    max-width: 800px; /* Largeur maximale */
+    margin: auto;
+    padding: 30px;
+  }
+  
+  /* Espacement autour du formulaire dans la carte */
+  .card-body {
+    padding: 30px;
+  }
+  
+  /* Bordure pour les champs de formulaire */
+  .form-control {
+    border-bottom: 2px solid #faf8f8; /* Ligne sous chaque champ */
+    border-radius: 0; /* Coins carrés */
+    background-color: transparent; /* Enlever l'arrière-plan */
+    box-shadow: none; /* Supprimer l'ombre par défaut */
+  }
+  
+  .form-control:focus {
+    background-color: transparent; /* Arrière-plan transparent au focus */
+    border-bottom-color: #007bff; /* Ligne bleue au focus */
+    outline: none; /* Retirer la bordure de focus */
+  }
+  
+  /* Boutons et autres éléments */
+  .btn {
+    width: auto; /* Ne pas forcer la largeur à 100% */
+    margin-right: 10px; /* Espacement entre les boutons */
+  }
+  
+  .btn-primary {
+    background-color: #007bff;
+    border: none;
+    color: white;
+  }
+  
+  .btn-danger {
+    background-color: #dc3545;
+    border: none;
+    color: white;
+  }
+  
+  .btn:hover {
+    opacity: 0.8;
+  }
+  
+  .form-label {
+    font-weight: bold;
+    color: #333;
+  }
+  
+  .text-danger {
+    font-size: 12px;
+    color: #dc3545;
+  }
+  
+  /* Responsivité */
+  @media (max-width: 767px) {
+    .content-wrapper {
+      padding: 10px;
+    }
+  
+    .card {
+      width: 100%;
+      margin-top: 10px;
+    }
+  
+    .btn {
+      width: auto;
+      margin-right: 5px; /* Moins d'espace entre les boutons pour les petits écrans */
+    }
+  }
+  
+  /* Modal style */
+.modal {
+    display: block;
+    background: rgba(0, 0, 0, 0.5); /* Pour l'effet de fond sombre */
+    transition: opacity 0.5s ease-in-out;
+  }
+  

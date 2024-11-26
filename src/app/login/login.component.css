@@ -267,3 +267,10 @@ a:hover {
   text-decoration: dashed;
   font-weight: bold;
 }
+
+.error-message {
+  color: red;
+  font-size: 0.9rem;
+  margin-top: 5px;
+  text-align: left;
+}

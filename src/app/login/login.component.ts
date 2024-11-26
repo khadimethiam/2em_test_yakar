@@ -15,7 +15,10 @@ import { SocketService } from '../services/socket.service';  // Vérifiez que ce
 export class LoginComponent implements OnInit, OnDestroy {
   user = { email: '', mot_de_passe: '' };
   errorMessage = '';
+  errorMessages = { email: '', mot_de_passe: '' };
   focusState: { [key: string]: boolean } = { username: false, password: false };
+  socket: any;
+  private keypadInputHandled = false;
 
   // Ajoutez une variable pour stocker la touche pressée
   lastKeyPressed: string = '';
@@ -61,10 +64,35 @@ export class LoginComponent implements OnInit, OnDestroy {
         } else {
           this.errorMessage = 'Erreur lors de la connexion';
         }
+
+        this.authService.login(this.user).subscribe(
+          (res) => {
+            if (res.token) {
+              localStorage.setItem('token', res.token);
+              const role = this.getRoleFromToken(res.token);
+              if (role === 'admin') {
+                this.router.navigate(['/dashboard']);
+              } else {
+                this.router.navigate(['/dashboard-simple']);
+              }
+            } else {
+              this.errorMessage = 'Erreur lors de la connexion';
+            }
+          },
+          (err) => {
+            console.error(err);
+            if (err.status === 403) {
+              this.errorMessage =
+                "Votre compte est inactif. Veuillez contacter l'administrateur.";
+            } else {
+              this.errorMessage = 'Erreur lors de la connexion';
+            }
+          }
+        );
       },
       (err) => {
         console.error(err);
-        this.errorMessage = 'Erreur lors de la connexion';
+        this.errorMessage = "Erreur lors de la vérification de l'utilisateur";
       }
     );
   }

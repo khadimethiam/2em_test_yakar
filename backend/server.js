@@ -7,6 +7,11 @@ const cors = require("cors");
 const jwt = require("jsonwebtoken");
 const multer = require("multer");
 const path = require("path");
+const multer = require("multer");
+const path = require("path");
+const { SerialPort, ReadlineParser } = require("serialport");
+const { Request, Response } = require('express');
+
 
 const app = express();
 const server = http.createServer(app);
@@ -27,7 +32,7 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // Connexion à MongoDB
 mongoose
-  .connect("mongodb://localhost:27017/test_yakar", {
+  .connect("mongodb://localhost:27017/Projet_Angular", {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   })
@@ -155,6 +160,15 @@ app.post("/login", async (req, res) => {
 
     if (!user) {
       return res.status(400).json({ message: "Email ou mot de passe incorrect" });
+    }
+
+    if (user.status === "inactif") {
+      return res
+        .status(403)
+        .json({
+          message:
+            "Votre compte est inactif. Veuillez contacter l'administrateur.",
+        });
     }
 
     const isMatch = await bcrypt.compare(mot_de_passe, user.mot_de_passe);

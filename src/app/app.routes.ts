@@ -5,6 +5,10 @@ import { DashboardSimpleComponent } from './dashboard-simple/dashboard-simple.co
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { LoginCodeComponent } from './login-code/login-code.component';
 import { UserListComponent } from './user-list/user-list.component';
+import { HostListener } from '@angular/core';
+import { UpdateComponent } from './update/update.component';
+import { EditProfileComponent } from './edit-profile/edit-profile.component';
+
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },
