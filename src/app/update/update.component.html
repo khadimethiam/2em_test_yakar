@@ -1,13 +1,16 @@
-
-
 <app-sidebar></app-sidebar>
 
 <div class="content-wrapper container-fluid">
-  <div *ngIf="showPersonalInfoForm || showAccountForm" class="card shadow-lg mb-4 mx-auto">
+  <div
+    *ngIf="showPersonalInfoForm || showAccountForm"
+    class="card shadow-lg mb-4 mx-auto"
+  >
     <div class="card-body">
       <h5 class="card-title text-center mb-4">Mettre à jour l'Utilisateur</h5>
       <form
-        (ngSubmit)="showPersonalInfoForm ? onSubmitPersonalInfo() : onSubmitAccountInfo()"
+        (ngSubmit)="
+          showPersonalInfoForm ? onSubmitPersonalInfo() : onSubmitAccountInfo()
+        "
         #updateUserForm="ngForm"
       >
         <!-- Étape 1 : Informations personnelles -->
@@ -65,7 +68,9 @@
           </div>
 
           <div class="mb-3">
-            <label for="numero_tel" class="form-label">Numéro de Téléphone</label>
+            <label for="numero_tel" class="form-label"
+              >Numéro de Téléphone</label
+            >
             <input
               type="tel"
               id="numero_tel"
@@ -77,7 +82,10 @@
               pattern="^[0-9]{9}$"
               #numero_tel="ngModel"
             />
-            <div *ngIf="numero_tel.invalid && numero_tel.touched" class="text-danger">
+            <div
+              *ngIf="numero_tel.invalid && numero_tel.touched"
+              class="text-danger"
+            >
               Numéro invalide (9 chiffres requis).
             </div>
           </div>
@@ -86,7 +94,9 @@
         <!-- Étape 2 : Informations de compte -->
         <div *ngIf="showAccountForm">
           <div class="mb-3">
-            <label for="oldPassword" class="form-label">Ancien Mot de Passe</label>
+            <label for="oldPassword" class="form-label"
+              >Ancien Mot de Passe</label
+            >
             <div class="input-group">
               <input
                 type="{{ showPassword ? 'text' : 'password' }}"
@@ -98,17 +108,28 @@
                 required
                 #oldPassword="ngModel"
               />
-              <span class="input-group-text" (click)="togglePasswordVisibility()">
-                <i class="bi" [ngClass]="showPassword ? 'bi-eye-slash' : 'bi-eye'"></i>
+              <span
+                class="input-group-text"
+                (click)="togglePasswordVisibility()"
+              >
+                <i
+                  class="bi"
+                  [ngClass]="showPassword ? 'bi-eye-slash' : 'bi-eye'"
+                ></i>
               </span>
             </div>
-            <div *ngIf="oldPassword.invalid && oldPassword.touched" class="text-danger">
+            <div
+              *ngIf="oldPassword.invalid && oldPassword.touched"
+              class="text-danger"
+            >
               L'ancien mot de passe est requis.
             </div>
           </div>
 
           <div class="mb-3">
-            <label for="password" class="form-label">Nouveau Mot de Passe</label>
+            <label for="password" class="form-label"
+              >Nouveau Mot de Passe</label
+            >
             <div class="input-group">
               <input
                 type="{{ showPassword ? 'text' : 'password' }}"
@@ -121,29 +142,49 @@
                 minlength="6"
                 #password="ngModel"
               />
-              <span class="input-group-text" (click)="togglePasswordVisibility()">
-                <i class="bi" [ngClass]="showPassword ? 'bi-eye-slash' : 'bi-eye'"></i>
+              <span
+                class="input-group-text"
+                (click)="togglePasswordVisibility()"
+              >
+                <i
+                  class="bi"
+                  [ngClass]="showPassword ? 'bi-eye-slash' : 'bi-eye'"
+                ></i>
               </span>
             </div>
-            <div *ngIf="password.invalid && password.touched" class="text-danger">
+            <div
+              *ngIf="password.invalid && password.touched"
+              class="text-danger"
+            >
               Le mot de passe doit avoir au moins 6 caractères.
             </div>
           </div>
 
           <div class="mb-3">
             <label for="photo" class="form-label">Photo</label>
-            <input type="file" id="photo" (change)="onFileChange($event)" class="form-control" />
+            <input
+              type="file"
+              id="photo"
+              (change)="onFileChange($event)"
+              class="form-control"
+            />
           </div>
         </div>
 
         <div class="d-flex justify-content-between">
-          <button type="button" class="btn btn-danger btn-sm" (click)="cancel()">Annuler</button>
+          <button
+            type="button"
+            class="btn btn-danger btn-sm"
+            (click)="cancel()"
+          >
+            Annuler
+          </button>
           <button
             type="submit"
             class="btn btn-primary btn-sm"
             [disabled]="updateUserForm.invalid"
           >
-            {{ showPersonalInfoForm ? 'Suivant' : 'Enregistrer' }}
+            {{ showPersonalInfoForm ? "Suivant" : "Enregistrer" }}
           </button>
         </div>
       </form>

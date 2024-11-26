@@ -15,13 +15,14 @@ body {
   align-items: center;
   height: 100vh;
   margin: 0;
-  background-color: #1a1a1a;
-  color: #f1f1f1;
+  background-color: #ffffff;
+  color: #333;
 }
+
 .masked {
-  background-color: #ddd;
+  background-color: #f5f5f5;
   color: transparent;
-  text-shadow: 0 0 0 #000;
+  text-shadow: 0 0 0 #333;
 }
 
 .container {
@@ -31,8 +32,8 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  box-shadow: 0 0 15px 5px #4d4d4d;
-  background-color: #2a2a2a;
+  box-shadow: 0 0 15px 5px #8bb3f8;
+  background-color: #ffffff;
   border-radius: 15px;
   margin: 20px;
 }
@@ -64,7 +65,7 @@ form {
 
 .login-content h2 {
   margin: 15px 0;
-  color: #f1f1f1;
+  color: #333;
   text-transform: uppercase;
   font-size: 2.9rem;
 }
@@ -79,13 +80,13 @@ form {
   width: 40px;
   height: 40px;
   margin-right: 10px;
-  border: 2px solid #3d3d3d;
+  border: 2px solid #d9d9d9;
   border-radius: 5px;
   text-align: center;
   font-size: 1.5rem;
   outline: none;
-  background-color: #2a2a2a;
-  color: #f1f1f1;
+  background-color: #ffffff;
+  color: #333;
 }
 
 a {
@@ -98,7 +99,7 @@ a {
 }
 
 a:hover {
-  color: #4d4d4d;
+  color: #8bb3f8;
 }
 
 .btn {
@@ -108,10 +109,10 @@ a:hover {
   border-radius: 25px;
   outline: none;
   border: none;
-  background-image: linear-gradient(to right, #333, #4d4d4d, #333);
+  background-image: linear-gradient(to right, #8bb3f7, #8bb3f9, #8bb3f7);
   background-size: 200%;
   font-size: 1.2rem;
-  color: #f1f1f1;
+  color: #fff;
   font-family: "Poppins", sans-serif;
   text-transform: uppercase;
   margin: 1rem 0;
@@ -169,7 +170,7 @@ a:hover {
 
 .social-login p {
   font-size: 1rem;
-  color: #f1f1f1;
+  color: #333;
   margin-bottom: 0.5rem;
 }
 
@@ -177,7 +178,7 @@ a:hover {
   display: inline-block;
   margin: 0 0.5rem;
   font-size: 1.5rem;
-  color: #f1f1f1;
+  color: #333;
   transition: color 0.3s;
 }
 
@@ -202,4 +203,10 @@ a:hover {
   color: #1da1f2;
   text-decoration: dashed;
   font-weight: bold;
+}
+.error-message {
+  color: red;
+  font-size: 0.9rem;
+  margin-top: 5px;
+  text-align: left;
 }

@@ -6,8 +6,6 @@ import { FormsModule } from '@angular/forms';
 import { SidebarComponent } from '../sidebar/sidebar.component';
 import * as bcrypt from 'bcryptjs';
 
-
-
 interface User {
   _id: string;
   prenom: string;
@@ -53,7 +51,6 @@ export class UpdateComponent implements OnInit {
     password: '',
     photo: null as File | null,
   };
-  
 
   constructor(private http: HttpClient, private router: Router) {}
 
@@ -68,9 +65,11 @@ export class UpdateComponent implements OnInit {
       }
     }
   }
-  
+
   onSubmitPersonalInfo() {
-    console.log('onSubmitPersonalInfo: Passage au formulaire des informations de compte');
+    console.log(
+      'onSubmitPersonalInfo: Passage au formulaire des informations de compte'
+    );
     this.showPersonalInfoForm = false;
     this.showAccountForm = true;
   }
@@ -82,23 +81,30 @@ export class UpdateComponent implements OnInit {
       return;
     }
     this.isSubmitting = true;
-  
+
     const token = localStorage.getItem('token');
     const headers = new HttpHeaders({ Authorization: `Bearer ${token}` });
-  
+
     // Vérification de l'ancien mot de passe
     this.http
-      .post(`http://localhost:3000/users/verify-password`, {
-        userId: this.userId,
-        oldPassword: this.userAccountInfo.oldPassword,
-      }, { headers })
+      .post(
+        `http://localhost:3000/users/verify-password`,
+        {
+          userId: this.userId,
+          oldPassword: this.userAccountInfo.oldPassword,
+        },
+        { headers }
+      )
       .subscribe(
         (response: any) => {
           console.log('Ancien mot de passe validé:', response);
-  
+
           // Hacher le nouveau mot de passe avant de l'envoyer
-          const hashedPassword = bcrypt.hashSync(this.userAccountInfo.password, 10);
-  
+          const hashedPassword = bcrypt.hashSync(
+            this.userAccountInfo.password,
+            10
+          );
+
           const formData = new FormData();
           formData.append('nom', this.userPersonalInfo.nom);
           formData.append('prenom', this.userPersonalInfo.prenom);
@@ -108,20 +114,24 @@ export class UpdateComponent implements OnInit {
           if (this.userAccountInfo.photo) {
             formData.append('photo', this.userAccountInfo.photo);
           }
-  
-          this.http.put(`http://localhost:3000/users/${this.userId}`, formData, { headers }).subscribe(
-            (updateResponse: any) => {
-              console.log('Mise à jour réussie:', updateResponse);
-              this.isSubmitting = false;
-              this.successMessage = 'Mise à jour réussie.';
-              this.router.navigate(['/user-list']);
-            },
-            (updateError) => {
-              console.error('Erreur lors de la mise à jour:', updateError);
-              this.isSubmitting = false;
-              this.errorMessage = "Une erreur s'est produite.";
-            }
-          );
+
+          this.http
+            .put(`http://localhost:3000/users/${this.userId}`, formData, {
+              headers,
+            })
+            .subscribe(
+              (updateResponse: any) => {
+                console.log('Mise à jour réussie:', updateResponse);
+                this.isSubmitting = false;
+                this.successMessage = 'Mise à jour réussie.';
+                this.router.navigate(['/user-list']);
+              },
+              (updateError) => {
+                console.error('Erreur lors de la mise à jour:', updateError);
+                this.isSubmitting = false;
+                this.errorMessage = "Une erreur s'est produite.";
+              }
+            );
         },
         (error) => {
           console.error('Ancien mot de passe invalide:', error);
@@ -130,10 +140,13 @@ export class UpdateComponent implements OnInit {
         }
       );
   }
-  
+
   togglePasswordVisibility() {
     this.showPassword = !this.showPassword;
-    console.log('togglePasswordVisibility: Visibilité du mot de passe modifiée', this.showPassword);
+    console.log(
+      'togglePasswordVisibility: Visibilité du mot de passe modifiée',
+      this.showPassword
+    );
   }
 
   onFileChange(event: any) {

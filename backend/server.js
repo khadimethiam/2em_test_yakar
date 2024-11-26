@@ -9,8 +9,7 @@ const jwt = require("jsonwebtoken");
 const multer = require("multer");
 const path = require("path");
 const { SerialPort, ReadlineParser } = require("serialport");
-const { Request, Response } = require('express');
-
+const { Request, Response } = require("express");
 
 const app = express();
 const server = http.createServer(app);
@@ -36,7 +35,7 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // Connexion à MongoDB
 mongoose
-  .connect("mongodb://localhost:27017/Projet_Angular", {
+  .connect("mongodb://localhost:27017/2em_test_yakar", {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   })
@@ -177,12 +176,10 @@ app.post("/login", async (req, res) => {
     }
 
     if (user.status === "inactif") {
-      return res
-        .status(403)
-        .json({
-          message:
-            "Votre compte est inactif. Veuillez contacter l'administrateur.",
-        });
+      return res.status(403).json({
+        message:
+          "Votre compte est inactif. Veuillez contacter l'administrateur.",
+      });
     }
 
     const isMatch = await bcrypt.compare(mot_de_passe, user.mot_de_passe);
@@ -218,12 +215,10 @@ app.post("/login-code", async (req, res) => {
     }
 
     if (user.status === "inactif") {
-      return res
-        .status(403)
-        .json({
-          message:
-            "Votre compte est inactif. Veuillez contacter l'administrateur.",
-        });
+      return res.status(403).json({
+        message:
+          "Votre compte est inactif. Veuillez contacter l'administrateur.",
+      });
     }
 
     const token = jwt.sign(
@@ -305,7 +300,7 @@ app.get("/api/users", authenticate, async (req, res) => {
 });
 
 // Configuration du port série pour lire les données du keypad
-/*const portPath = "COM4"; // Remplacez 'COM4' par le port série de votre Arduino
+const portPath = "COM5"; // Remplacez 'COM4' par le port série de votre Arduino
 if (!portPath) {
   console.error("Le chemin du port série n'est pas défini");
   process.exit(1);
@@ -326,39 +321,82 @@ parser.on("data", (data) => {
   console.log("Données du keypad reçues:", data);
   // Envoyer les données du keypad à tous les clients connectés
   io.emit("keypad-input", data);
-});*/
+});
 
 // Démarrage du serveur
 server.listen(3000, () => {
   console.log("Serveur démarré sur le port 3000");
 });
 
+// Endpoint pour contrôler le ventilateur
+app.post("/fan-control", (req, res) => {
+  const { status } = req.body; // On attend une commande 'status' dans le corps de la requête
 
-// Route pour mettre à jour les informations de l'utilisateur (y compris la photo)
-app.put("/users/:id", authenticate, upload.single("photo"), async (req, res) => {
-  try {
-    const id = req.params.id;
-    const updates = req.body;
-
-    // Ajout de la gestion du fichier photo
-    if (req.file) {
-      updates.photo = req.file.path;  // Assurez-vous que le chemin est correct
-    }
-
-    // Mise à jour de l'utilisateur dans la base de données
-    const updatedUser = await User.findByIdAndUpdate(id, updates, { new: true });
-
-    if (!updatedUser) {
-      return res.status(404).send("Utilisateur non trouvé");
-    }
-
-    res.status(200).json({ message: "Mise à jour réussie", user: updatedUser });
-  } catch (err) {
-    console.error("Erreur lors de la mise à jour :", err);
-    res.status(500).send("Erreur serveur");
+  if (status === "ON") {
+    // Envoi de la commande série à l'Arduino pour activer le ventilateur manuellement
+    console.log("Activer ventilateur");
+    port.write("VENTILATEUR_ON\n", (err) => {
+      if (err) {
+        console.error("Erreur d'envoi de la commande à l'Arduino:", err);
+        return res
+          .status(500)
+          .send({ message: "Erreur lors de l'activation du ventilateur" });
+      }
+      return res.send({ message: "Ventilateur activé manuellement", status });
+    });
+  } else if (status === "OFF") {
+    // Envoi de la commande série à l'Arduino pour désactiver le ventilateur manuellement
+    console.log("Désactiver ventilateur");
+    port.write("VENTILATEUR_OFF\n", (err) => {
+      if (err) {
+        console.error("Erreur d'envoi de la commande à l'Arduino:", err);
+        return res
+          .status(500)
+          .send({ message: "Erreur lors de la désactivation du ventilateur" });
+      }
+      return res.send({
+        message: "Ventilateur désactivé manuellement",
+        status,
+      });
+    });
+  } else {
+    return res.status(400).send({ message: "Commande inconnue" });
   }
 });
 
+// Route pour mettre à jour les informations de l'utilisateur (y compris la photo)
+app.put(
+  "/users/:id",
+  authenticate,
+  upload.single("photo"),
+  async (req, res) => {
+    try {
+      const id = req.params.id;
+      const updates = req.body;
+
+      // Ajout de la gestion du fichier photo
+      if (req.file) {
+        updates.photo = req.file.path; // Assurez-vous que le chemin est correct
+      }
+
+      // Mise à jour de l'utilisateur dans la base de données
+      const updatedUser = await User.findByIdAndUpdate(id, updates, {
+        new: true,
+      });
+
+      if (!updatedUser) {
+        return res.status(404).send("Utilisateur non trouvé");
+      }
+
+      res
+        .status(200)
+        .json({ message: "Mise à jour réussie", user: updatedUser });
+    } catch (err) {
+      console.error("Erreur lors de la mise à jour :", err);
+      res.status(500).send("Erreur serveur");
+    }
+  }
+);
 
 app.post("/users/verify-password", authenticate, async (req, res) => {
   try {
@@ -381,9 +419,6 @@ app.post("/users/verify-password", authenticate, async (req, res) => {
     res.status(500).json({ message: "Erreur serveur" });
   }
 });
-
-
-
 
 // 3. Déconnexion
 app.post("/logout", authenticate, (req, res) => {
