@@ -8,6 +8,7 @@ const cors = require("cors");
 const jwt = require("jsonwebtoken");
 const multer = require("multer");
 const path = require("path");
+const axios = require("axios"); // Pour les requêtes HTTP
 const { SerialPort, ReadlineParser } = require("serialport");
 const { Request, Response } = require("express");
 
@@ -322,47 +323,73 @@ parser.on("data", (data) => {
   // Envoyer les données du keypad à tous les clients connectés
   io.emit("keypad-input", data);
 });
-
-// Démarrage du serveur
-server.listen(3000, () => {
-  console.log("Serveur démarré sur le port 3000");
-});
-
-// Endpoint pour contrôler le ventilateur
-app.post("/fan-control", (req, res) => {
-  const { status } = req.body; // On attend une commande 'status' dans le corps de la requête
-
+// Fonction pour contrôler le ventilateur
+function controlFan(status) {
   if (status === "ON") {
-    // Envoi de la commande série à l'Arduino pour activer le ventilateur manuellement
-    console.log("Activer ventilateur");
+    console.log("Activation du ventilateur");
     port.write("VENTILATEUR_ON\n", (err) => {
       if (err) {
-        console.error("Erreur d'envoi de la commande à l'Arduino:", err);
-        return res
-          .status(500)
-          .send({ message: "Erreur lors de l'activation du ventilateur" });
+        console.error("Erreur en activant le ventilateur :", err);
+      } else {
+        console.log("Ventilateur activé avec succès !");
       }
-      return res.send({ message: "Ventilateur activé manuellement", status });
     });
   } else if (status === "OFF") {
-    // Envoi de la commande série à l'Arduino pour désactiver le ventilateur manuellement
-    console.log("Désactiver ventilateur");
+    console.log("Désactivation du ventilateur");
     port.write("VENTILATEUR_OFF\n", (err) => {
       if (err) {
-        console.error("Erreur d'envoi de la commande à l'Arduino:", err);
-        return res
-          .status(500)
-          .send({ message: "Erreur lors de la désactivation du ventilateur" });
+        console.error("Erreur en désactivant le ventilateur :", err);
+      } else {
+        console.log("Ventilateur désactivé avec succès !");
       }
-      return res.send({
-        message: "Ventilateur désactivé manuellement",
-        status,
-      });
+    });
+  } else {
+    console.error("Commande invalide pour le ventilateur");
+  }
+}
+
+// Endpoint pour contrôler le ventilateur manuellement
+app.post("/fan-control", (req, res) => {
+  const { status } = req.body;
+
+  console.log("Commande reçue pour contrôler le ventilateur :", status);
+
+  if (status === "ON" || status === "OFF") {
+    controlFan(status);
+    return res.send({
+      message: `Ventilateur ${
+        status === "ON" ? "activé" : "désactivé"
+      } manuellement`,
+      status,
     });
   } else {
     return res.status(400).send({ message: "Commande inconnue" });
   }
 });
+
+// Périodiquement interroger le Serveur 1 pour récupérer la température
+const SERVER_1_URL = "http://localhost:3002/api/data/temperature"; // Remplace par l'adresse de ton Serveur 1
+
+setInterval(async () => {
+  try {
+    const response = await axios.get(SERVER_1_URL);
+    const temperature = response.data.value;
+
+    console.log("Température reçue :", temperature);
+
+    // Contrôle automatique du ventilateur
+    if (temperature > 27) {
+      controlFan("ON");
+    } else {
+      controlFan("OFF");
+    }
+  } catch (error) {
+    console.error(
+      "Erreur lors de la récupération des données :",
+      error.message
+    );
+  }
+}, 5000); // Vérifie toutes les 5 secondes (modifiable selon ton besoin)
 
 // Route pour mettre à jour les informations de l'utilisateur (y compris la photo)
 app.put(
@@ -430,4 +457,9 @@ app.post("/logout", authenticate, (req, res) => {
   }
 
   res.status(200).json({ message: "Déconnexion réussie" });
+});
+// Démarrer le serveur
+const PORT = 3000;
+app.listen(PORT, () => {
+  console.log(`Serveur 2 démarré sur le port ${PORT}`);
 });

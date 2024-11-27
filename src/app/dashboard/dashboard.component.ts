@@ -226,7 +226,7 @@ export class DashboardComponent implements OnInit {
     try {
       const response: any = await this.http
         .get<{ humidity: string; temperature: string }>(
-          'http://localhost:3002/api/data/16h16'
+          'http://localhost:3002/api/data/13h15'
         )
         .toPromise();
       this.humidity_23h05 = response.humidity + '%';
@@ -250,7 +250,7 @@ export class DashboardComponent implements OnInit {
     try {
       const response: any = await this.http
         .get<{ humidity: string; temperature: string }>(
-          'http://localhost:3002/api/data/16h17'
+          'http://localhost:3002/api/data/13h16'
         )
         .toPromise();
       this.humidity_23h10 = response.humidity + '%';
@@ -272,7 +272,7 @@ export class DashboardComponent implements OnInit {
     try {
       const response: any = await this.http
         .get<{ humidity: string; temperature: string }>(
-          'http://localhost:3002/api/data/16h18'
+          'http://localhost:3002/api/data/13h17'
         )
         .toPromise();
       this.humidity_23h14 = response.humidity + '%';

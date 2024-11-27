@@ -118,9 +118,9 @@ async function saveDataToDB(hour) {
 
 // Heures spécifiques à surveiller
 let dataForSpecificHours = {
-  "16h16": { temperature: null, humidity: null },
-  "16h17": { temperature: null, humidity: null },
-  "16h18": { temperature: null, humidity: null },
+  "13h15": { temperature: null, humidity: null },
+  "13h16": { temperature: null, humidity: null },
+  "13h17": { temperature: null, humidity: null },
 };
 
 function checkAndSaveData() {
@@ -201,7 +201,7 @@ async function calculateAndSaveDailyAverages() {
 // Planification du calcul et de l'enregistrement des moyennes 5 minutes après la dernière heure de collecte (12h05)
 setInterval(() => {
   const now = new Date();
-  if (now.getHours() === 16 && now.getMinutes() === 20) {
+  if (now.getHours() === 13 && now.getMinutes() === 18) {
     calculateAndSaveDailyAverages();
   }
 }, 60000);
@@ -216,7 +216,7 @@ app.post("/api/data/save", async (req, res) => {
   }
 });
 
-const specificHoursRoutes = ["16h16", "16h17", "16h30"];
+const specificHoursRoutes = ["13h15", "13h16", "13h17"];
 
 specificHoursRoutes.forEach((hour) => {
   app.get(`/api/data/${hour}`, async (req, res) => {
@@ -336,8 +336,6 @@ app.get("/api/data/daily-averages", async (req, res) => {
     res.status(500).json({ message: "Erreur serveur" });
   }
 });
-
-
 
 app.listen(port, () => {
   console.log(`Server running on http://localhost:${port}`);
