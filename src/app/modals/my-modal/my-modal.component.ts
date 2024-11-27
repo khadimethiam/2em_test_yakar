@@ -3,6 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common'; // Importez CommonModule
 import { UtilisateurService } from '../../services/utilisateur.service';
+import { AuthService } from '../../auth.service';
 import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
@@ -25,6 +26,7 @@ export class MyModalComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private userService: UtilisateurService,
+    private userAuth: AuthService,
     private route: ActivatedRoute,
     private router: Router,
 
@@ -58,6 +60,7 @@ export class MyModalComponent implements OnInit {
   }
   
   loadUser() {
+    this.userId = this.route.snapshot.paramMap.get('id')!;
     this.isLoading = true;
     this.userService.getUserById(this.userId).subscribe({
       next: (user) => {

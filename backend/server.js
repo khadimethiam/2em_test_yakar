@@ -80,11 +80,10 @@ const authenticate = (req, res, next) => {
 
   try {
     const decoded = jwt.verify(token, "secret_key");
-    req.userId = decoded.userId;
-    req.role = decoded.role;
+    req.user = { userId: decoded.userId, role: decoded.role }; // Corrigé
 
     // Vérifier si l'utilisateur a le rôle 'admin'
-    if (req.role !== "admin") {
+    if (decoded.role !== "admin") {
       return res
         .status(403)
         .json({ message: "Accès interdit, administrateur uniquement" });
@@ -95,6 +94,48 @@ const authenticate = (req, res, next) => {
     return res.status(401).json({ message: "Token invalide" });
   }
 };
+
+app.get("/me", authenticate, async (req, res) => {
+  try {
+    // Utilisez l'ID de l'utilisateur extrait par le middleware `authenticate`
+    const user = await User.findById(req.user.userId).select("-mot_de_passe -__v"); // Exclut le mot de passe et d'autres champs sensibles
+
+    if (!user) {
+      return res.status(404).json({ message: "Utilisateur non trouvé." });
+    }
+
+    if (user.status === "inactif") {
+      return res.status(403).json({ message: "Votre compte est inactif. Veuillez contacter l'administrateur." });
+    }
+
+    res.status(200).json(user);
+  } catch (error) {
+    console.error("Erreur lors de la récupération des informations utilisateur:", error);
+    res.status(500).json({ message: "Erreur serveur." });
+  }
+});
+
+
+
+//Route pour récupérer un utilisateur par son ID
+app.get('/:id', async (req, res) => {
+  try {
+    const userId = req.params.id; // Récupérer l'ID de l'utilisateur depuis les paramètres de l'URL
+
+    // Vérifier si l'utilisateur existe
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({ message: 'Utilisateur non trouvé.' });
+    }
+
+    // Réponse avec les données utilisateur
+    res.status(200).json(user);
+  } catch (error) {
+    console.error('Erreur lors de la récupération de l\'utilisateur:', error);
+    res.status(500).json({ message: 'Erreur serveur.' });
+  }
+});
 
 // Route de mise à jour du rôle de l'utilisateur (avec authentification)
 app.put("/api/users/:id/role", authenticate, async (req, res) => {
@@ -164,67 +205,6 @@ app.post("/register", upload.single("photo"), async (req, res) => {
   }
 });
 
-// Route de modification d'un utilisateur
-app.put("/update/:id", async (req, res) => {
-    const { nom, prenom, email, telephone, motDePasse, role } = req.body;
-    const { id } = req.params; // Récupère l'id de l'utilisateur depuis les paramètres de la requête
-  
-    try {
-      // Vérifie si l'utilisateur existe
-      const user = await User.findById(id);
-      if (!user) {
-        return res.status(404).json({ message: 'Utilisateur non trouvé' });
-      }
-  
-      // Vérifie si l'email est déjà utilisé par un autre utilisateur
-      const emailExists = await User.findOne({ email, _id: { $ne: id } });
-      if (emailExists) {
-        return res.status(400).json({ message: 'Cet email est déjà utilisé par un autre utilisateur.' });
-      }
-  
-      // Mise à jour des données de l'utilisateur
-      user.nom = nom || user.nom;
-      user.prenom = prenom || user.prenom;
-      user.email = email || user.email;
-      user.role = role || user.role;
-      user.numero_tel = telephone || user.numero_tel;
-  
-      // Mise à jour et hachage du mot de passe si un nouveau mot de passe est fourni
-      if (motDePasse) {
-        user.mot_de_passe = await bcrypt.hash(motDePasse, 10);
-      }
-  
-      // Enregistrer les changements
-      const updatedUser = await user.save();
-  
-      // Répondre avec les données mises à jour
-      res.status(200).json({
-        _id: updatedUser.id,
-        nom: updatedUser.nom,
-        prenom: updatedUser.prenom,
-        email: updatedUser.email,
-        role: updatedUser.role,
-        telephone: updatedUser.numero_tel,
-      });
-    } catch (error) {
-      res.status(500).json({ message: error.message });
-    }
-  
-});
-
-// Obtenir un utilisateur par ID
-app.get("/:id",  async (req, res) => {
-  try {
-    const user = await User.findById(req.params.id);
-    if (!user) {
-      return res.status(404).json({ message: 'Utilisateur non trouvé' });
-    }
-    res.json(user);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-});
-
 // Route de connexion
 app.post("/login", async (req, res) => {
   try {
@@ -265,6 +245,32 @@ app.post("/login", async (req, res) => {
     res.status(500).json({ message: "Erreur lors de la connexion" });
   }
 });
+
+// Route pour récupérer les informations de l'utilisateur connecté
+app.get("/profile", authenticate, async (req, res) => {
+  try {
+    const user = await User.findById(req.user.userId).select("nom prenom photo"); // Corrigé
+
+    if (!user) {
+      return res.status(404).json({ message: "Utilisateur non trouvé" });
+    }
+
+    const profile = {
+      id: user.id,
+      nom: user.nom,
+      email: user.email,
+      telephone: user.numero_tel,
+      prenom: user.prenom,
+      photo: user.photo ? `/uploads/${user.photo}` : null,
+    };
+
+    res.status(200).json(profile);
+  } catch (err) {
+    console.error("Erreur lors de la récupération du profil :", err);
+    res.status(500).json({ message: "Erreur serveur" });
+  }
+});
+
 
 // Route d'authentification avec le code généré
 app.post("/login-code", async (req, res) => {
@@ -366,7 +372,7 @@ app.get("/api/users", authenticate, async (req, res) => {
 });
 
 // Configuration du port série pour lire les données du keypad
-/*const portPath = "COM4"; // Remplacez 'COM4' par le port série de votre Arduino
+/*const portPath = "/dev/ttyUSB0"; // Remplacez 'COM4' par le port série de votre Arduino
 if (!portPath) {
   console.error("Le chemin du port série n'est pas défini");
   process.exit(1);
@@ -387,12 +393,9 @@ parser.on("data", (data) => {
   console.log("Données du keypad reçues:", data);
   // Envoyer les données du keypad à tous les clients connectés
   io.emit("keypad-input", data);
-});*/
+}); */
 
-// Démarrage du serveur
-server.listen(3000, () => {
-  console.log("Serveur démarré sur le port 3000");
-});
+
 
 
 // Route pour mettre à jour les informations de l'utilisateur (y compris la photo)
@@ -456,4 +459,9 @@ app.post("/logout", authenticate, (req, res) => {
   }
 
   res.status(200).json({ message: "Déconnexion réussie" });
+});
+
+// Démarrage du serveur
+server.listen(3000, () => {
+  console.log("Serveur démarré sur le port 3000");
 });

@@ -25,18 +25,24 @@ export class RegisterComponent {
   constructor(private authService: AuthService, private router: Router) {}
 
   onRegister() {
-    this.authService.register(this.user).subscribe(
-      (res) => {
-        if (typeof res === 'object' && res.message) {
-          this.router.navigate(['/login']);
-        } else {
+    const token = localStorage.getItem('authToken'); // Ou une autre méthode pour récupérer le token
+  
+    if (token) {
+      this.authService.register(this.user, token).subscribe(
+        (res) => {
+          if (typeof res === 'object' && res.message) {
+            this.router.navigate(['/login']);
+          } else {
+            this.errorMessage = "Erreur lors de l'inscription";
+          }
+        },
+        (err) => {
+          console.error(err);
           this.errorMessage = "Erreur lors de l'inscription";
         }
-      },
-      (err) => {
-        console.error(err);
-        this.errorMessage = "Erreur lors de l'inscription";
-      }
-    );
+      );
+    } else {
+      this.errorMessage = "Token introuvable. Veuillez vous reconnecter.";
+    }
   }
 }

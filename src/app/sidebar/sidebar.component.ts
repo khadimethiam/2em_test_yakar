@@ -14,12 +14,14 @@ import { CommonModule } from '@angular/common';
 export class SidebarComponent implements OnInit {
   toggleState: boolean = false;
   user: any = null; // Contiendra les données utilisateur
+  userId: string = '';
 
   constructor(public authService: AuthService) {}
 
   ngOnInit(): void {
     // Récupération des données utilisateur
-    this.authService.getUserProfile().subscribe(
+    
+    this.authService.getConnectedUser().subscribe(
       (data) => {
         this.user = data;
 

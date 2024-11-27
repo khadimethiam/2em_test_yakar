@@ -1,0 +1,42 @@
+<app-sidebar></app-sidebar>
+
+<div class="user-form-container">
+    <form [formGroup]="userForm" (ngSubmit)="saveChanges()">
+      <!-- Photo de l'utilisateur -->
+      <div class="user-photo-container">
+        <img class="user-photo" [src]="userForm.get('photo')?.value || '/images/profil.png'" alt="Photo utilisateur" />
+        <i class="edit-icon" (click)="toggleEditMode()" *ngIf="!isEditable">✏️</i>
+      </div>
+  
+      <!-- Détails de l'utilisateur -->
+      <div class="user-details">
+        <div class="detail-row">
+          <label for="prenom">Prénom :</label>
+          <span *ngIf="!isEditable" >{{ userForm.get('prenom')?.value }}</span>
+          <input *ngIf="isEditable" type="text" formControlName="prenom" />
+        </div>
+        <div class="detail-row">
+          <label for="nom">Nom :</label>
+          <span *ngIf="!isEditable">{{ userForm.get('nom')?.value }}</span>
+          <input *ngIf="isEditable" type="text" formControlName="nom" />
+        </div>
+        <div class="detail-row">
+          <label for="nom">Email :</label>
+          <span *ngIf="!isEditable">{{ userForm.get('email')?.value }}</span>
+          <input *ngIf="isEditable" type="email" formControlName="email" />
+        </div>
+        <div class="detail-row">
+          <label for="telephone">Téléphone :</label>
+          <span *ngIf="!isEditable">{{ userForm.get('telephone')?.value }}</span>
+          <input *ngIf="isEditable" type="tel" formControlName="telephone" />
+        </div>
+      </div>
+  
+      <!-- Bouton Mettre à jour -->
+      <div class="actions">
+        <button type="button" class="btn btn-danger btn-sm" (click)="cancel()">Retour au dashboard</button>
+        <button type="submit" [ngClass]="{ 'blue-button': isEditable }" [disabled]="!isEditable || !userForm.valid || !userForm.dirty" (click)="saveChanges()">Mettre à jour</button>
+      </div>
+    </form>
+  </div>
+  
