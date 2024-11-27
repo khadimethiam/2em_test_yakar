@@ -13,10 +13,20 @@
 
   <div class="d-flex justify-content-between align-items-center mb-3">
     <!-- Boutons pour filtrer les rôles -->
-    <div>
-      <button class="btn btn-primary btn-sm me-2" (click)="filterUsers('user')">Utilisateurs simples</button>
-      <button class="btn btn-outline-secondary btn-sm me-2" (click)="filterUsers('admin')">Admins</button>
-    </div>
+    <button
+    class="btn  btn-sm me-2"
+    [ngClass]="{ 'active': activeFilter === 'user' }"  
+    (click)="filterUsers('user')"
+  >
+    Utilisateurs simples
+  </button>
+  <button
+    class="btn btn-outline-secondary btn-sm me-2"
+    [ngClass]="{ 'active': activeFilter === 'admin' }" 
+    (click)="filterUsers('admin')"
+  >
+    Admins
+  </button>
   
     <div class="d-flex align-items-center search-container">
       <i class="bi bi-search search-icon"></i> <!-- Icône de recherche (Bootstrap Icons) -->
@@ -81,7 +91,7 @@
               class="form-control" 
               placeholder="Mot de passe" 
               required 
-              minlength="6" 
+              minlength="8" 
               #password="ngModel" />
         
             <!-- Icône pour afficher/masquer le mot de passe -->
@@ -89,7 +99,7 @@
               <i class="bi" [ngClass]="showPassword ? 'bi-eye-slash' : 'bi-eye'"></i>
             </span>
           </div>
-          <div *ngIf="password.invalid && password.touched" class="text-danger">Le mot de passe doit avoir au moins 6 caractères.</div>
+          <div *ngIf="password.invalid && password.touched" class="text-danger">Le mot de passe doit avoir au moins 8 caractères.</div>
         </div>
 
         <div class="mb-3">
@@ -115,6 +125,7 @@
   </div>
 </div>
 
+
  <!-- Tableau des utilisateurs -->
 <div *ngIf="!showPersonalInfoForm && !showAccountForm">
   <div class="table-responsive">
@@ -131,7 +142,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let user of users">
+        <tr *ngFor="let user of displayedUsers">
           <td>{{ user.prenom }}</td>
           <td>{{ user.nom }}</td>
           <td>{{ user.email }}</td>
@@ -164,6 +175,10 @@
           </button>
           
         </tr>
+
+        <div *ngIf="searchNotFoundMessage" class="alert alert-warning">
+          {{ searchNotFoundMessage }}
+        </div>
       </tbody>
     </table>
   </div>

@@ -15,7 +15,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
   toggleState: boolean = false; // État du toggle (false = OFF, true = ON)
   user: any = null; // Contiendra les données utilisateur
   private refreshInterval: any; // Variable pour stocker l'intervalle de rafraîchissement
-
+  userId: string = '';
   constructor(public authService: AuthService, private http: HttpClient) {}
 
   ngOnInit(): void {
@@ -28,21 +28,22 @@ export class SidebarComponent implements OnInit, OnDestroy {
     }, 5000); // Rafraîchit toutes les 5 secondes (modifiable selon tes besoins)
 
     // Récupération des données utilisateur
-    this.authService.getUserProfile().subscribe(
-      (data) => {
-        this.user = data;
-        // Ajouter l'URL complète pour la photo si elle est définie
-        if (this.user.photo) {
-          this.user.photo = `http://localhost:3000${this.user.photo}`;
-        }
+    this.authService.getConnectedUser().subscribe({
+      next: (user) => {
+        this.user = user;
+
+        this.user.photo =
+          user.photo === null
+            ? 'http://localhost:3000${user.photo}'
+            : 'images/profil.png';
       },
-      (error) => {
+      error: (err) => {
         console.error(
           'Erreur lors de la récupération des informations utilisateur',
-          error
+          err
         );
-      }
-    );
+      },
+    });
   }
 
   // Fonction pour récupérer l'état actuel du ventilateur depuis le serveur

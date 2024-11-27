@@ -5,7 +5,6 @@ import { FormsModule } from '@angular/forms';
 import { SidebarComponent } from '../sidebar/sidebar.component';
 
 import * as bootstrap from 'bootstrap';
-import { NavComponent } from '../nav/nav.component';
 import { Router } from '@angular/router';
 
 interface User {
@@ -27,6 +26,8 @@ interface User {
   templateUrl: './user-list.component.html',
   styleUrls: ['./user-list.component.css'],
 })
+
+
 export class UserListComponent {
   showAccountForm: boolean = false;
   showPersonalInfoForm: boolean = false;
@@ -37,6 +38,11 @@ export class UserListComponent {
   selectedUser: User | null = null; // Utilisateur sélectionné pour bloquer ou modifier
   searchPhone: string = ''; // Valeur du champ de recherche par numéro de téléphone
   showPassword = false; // Par défaut, le mot de passe est masqué
+  displayedUsers: User[] = [];
+  searchNotFoundMessage: string = '';
+  activeFilter: string = 'all'; // Par défaut, 'all' (tous les utilisateurs)
+
+
 
   userPersonalInfo: User = {
     nom: '',
@@ -60,7 +66,7 @@ export class UserListComponent {
   totalItems: number = 0; // Nombre total d'utilisateurs
   totalPages: number = 0; // Nombre total de pages
 
-  constructor(private http: HttpClient, private router: Router) {}
+  constructor(private http: HttpClient,private router: Router) {}
 
   navigateToUpdate() {
     this.router.navigate(['/update']);
@@ -70,14 +76,15 @@ export class UserListComponent {
     this.getUsers(); // Charger les utilisateurs au démarrage
   }
 
+
   editUser(user: User) {
     // Stocker l'utilisateur à modifier
     localStorage.setItem('userToUpdate', JSON.stringify(user));
     // Utiliser une seule route cohérente
-    this.router.navigate(['/update']);
+    this.router.navigate(['/update']); 
   }
-
-  // Supprimer navigateToUpdate() car il fait double emploi
+  
+ 
   // Méthode pour récupérer la liste des utilisateurs depuis l'API
   getUsers() {
     const token = localStorage.getItem('token'); // Récupérer le token
@@ -106,25 +113,23 @@ export class UserListComponent {
 
   // Filtrer les utilisateurs en fonction de leur rôle
   filterUsers(role: string) {
-    // Filtrer les utilisateurs en fonction du rôle sélectionné
+    this.activeFilter = role; // Mettez à jour l'état du filtre actif
+
     if (role === 'user') {
       this.filteredUsers = this.users.filter((user) => user.role === 'user');
     } else if (role === 'admin') {
       this.filteredUsers = this.users.filter((user) => user.role === 'admin');
     } else {
-      this.filteredUsers = this.users; // Affiche tous les utilisateurs si aucun filtre n'est appliqué
+      this.filteredUsers = [...this.users]; // Réinitialise aux utilisateurs complets
     }
-
-    // Met à jour le nombre total d'éléments filtrés et recalcule le nombre de pages
+  
+    // Mise à jour de la pagination
     this.totalItems = this.filteredUsers.length;
-    this.totalPages = Math.ceil(this.totalItems / this.itemsPerPage); // Recalculer totalPages après le filtrage
-
-    // Remise à zéro de la pagination pour commencer à partir de la première page après filtrage
-    this.currentPage = 1;
-
-    // Appliquer la pagination après avoir mis à jour les utilisateurs filtrés
-    this.paginateUsers();
+    this.totalPages = Math.ceil(this.totalItems / this.itemsPerPage);
+    this.currentPage = 1; // Revenir à la première page après un changement de filtre
+    this.paginateUsers(); // Appliquer la pagination sur les utilisateurs filtrés
   }
+  
 
   // Gérer la pagination et afficher les utilisateurs de la page actuelle
   paginateUsers() {
@@ -133,7 +138,7 @@ export class UserListComponent {
       startIndex,
       startIndex + this.itemsPerPage
     );
-    this.users = paginated; // Met à jour la liste des utilisateurs affichés
+    this.displayedUsers = paginated; // Utilisez une nouvelle variable pour afficher les utilisateurs
   }
 
   // Naviguer vers une page spécifique
@@ -375,6 +380,9 @@ export class UserListComponent {
     }
   }
   onSearchPhone() {
+    // Réinitialiser le message de recherche non trouvé
+    this.searchNotFoundMessage = '';
+  
     if (this.searchPhone.trim() === '') {
       // Si la recherche est vide, on affiche tous les utilisateurs
       this.filteredUsers = this.users;
@@ -384,13 +392,19 @@ export class UserListComponent {
         user.numero_tel.includes(this.searchPhone)
       );
     }
-
+  
+    // Si aucun utilisateur n'a été trouvé après le filtrage
+    if (this.filteredUsers.length === 0) {
+      this.searchNotFoundMessage = 'Aucun utilisateur trouvé avec ce numéro de téléphone.';
+    }
+  
     // Met à jour la pagination
     this.totalItems = this.filteredUsers.length;
     this.totalPages = Math.ceil(this.totalItems / this.itemsPerPage);
     this.currentPage = 1; // Remet à zéro la pagination
     this.paginateUsers(); // Applique la pagination après le filtrage
   }
+  
 
   togglePasswordVisibility() {
     this.showPassword = !this.showPassword; // Bascule l'état de visibilité

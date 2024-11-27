@@ -164,7 +164,7 @@
 
 
 .cold-bg {
-  background-image: url('/images/cold.jpg');
+  background-image: url('/images/temp15.jpg');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -174,7 +174,7 @@
 }
 
 .moderate-bg {
-  background-image: url('/images/moderate.jpg');
+  background-image: url('/images/temp20.jpg');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;

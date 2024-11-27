@@ -17,7 +17,7 @@
   margin-left: 370px;
   position: relative;
   top: 40px; /* Déplace le container vers le bas */
-  padding: 20px;
+  padding: 30px;
 }
 .card-body {
 height: 500px;
@@ -212,4 +212,15 @@ padding-right: 2.5rem; /* Ajoute un peu d'espace à droite pour l'icône */
 
 .bi {
 font-size: 1.2rem; /* Ajuster la taille de l'icône */
+}
+button.active {
+background-color: #007bff; /* Par exemple, un bleu pour le bouton actif */
+color: white; /* Texte en blanc pour le bouton actif */
+border-color: #007bff; /* Bordure colorée pour le bouton actif */
+}
+
+button:not(.active) {
+background-color: transparent;
+color: #007bff; /* Couleur de texte pour les boutons non actifs */
+border-color: #007bff; /* Bordure du bouton non actif */
 }

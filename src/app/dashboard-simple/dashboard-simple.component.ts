@@ -67,7 +67,7 @@ export class DashboardSimpleComponent implements OnInit {
     setInterval(() => {
       this.initializeData();
       this.getWeeklyData();
-    }, 3600000); // Toutes les heures
+    }, 1000); // Toutes les heures
   }
 
   async getWeeklyData() {
@@ -101,6 +101,15 @@ export class DashboardSimpleComponent implements OnInit {
     await this.getEveningDataForSpecificTime();
     await this.getNoonDataForSpecificTime();
     await this.getMorningDataForSpecificTime();
+  }
+
+
+  updateChartData() {
+    if (this.chart) {
+      this.chart.data.datasets[0].data = this.weeklyTemperature;
+      this.chart.data.datasets[1].data = this.weeklyHumidity;
+      this.chart.update();
+    }
   }
 
   createChart() {
@@ -173,7 +182,7 @@ export class DashboardSimpleComponent implements OnInit {
 
     if (tempValue < 15) {
       this.temperatureClass = 'cold-bg';
-    } else if (tempValue >= 15 && tempValue < 25) {
+    } else if (tempValue >= 15 && tempValue < 27) {
       this.temperatureClass = 'moderate-bg';
     } else {
       this.temperatureClass = 'hot-bg';
@@ -183,7 +192,7 @@ export class DashboardSimpleComponent implements OnInit {
   async getMorningDataForSpecificTime() {
     try {
       const response: any = await this.http
-        .get<{ humidity: string; temperature: string }>('http://localhost:3002/api/data/12h10')
+        .get<{ humidity: string; temperature: string }>('http://localhost:3002/api/data/09h53')
         .toPromise();
       this.humidity_23h05 = response.humidity + '%';
       this.temperature_23h05 = response.temperature + '°C';
@@ -198,7 +207,7 @@ export class DashboardSimpleComponent implements OnInit {
   async getNoonDataForSpecificTime() {
     try {
       const response: any = await this.http
-        .get<{ humidity: string; temperature: string }>('http://localhost:3002/api/data/12h11')
+        .get<{ humidity: string; temperature: string }>('http://localhost:3002/api/data/09h54')
         .toPromise();
       this.humidity_23h10 = response.humidity + '%';
       this.temperature_23h10 = response.temperature + '°C';
@@ -206,14 +215,14 @@ export class DashboardSimpleComponent implements OnInit {
       this.noonTemperature.push(parseFloat(this.temperature_23h10.replace('°C', '')));
       this.calculateAverages();
     } catch (error) {
-      console.error("Erreur lors de la récupération des données pour 21h46", error);
+      console.error("Erreur lors de la récupération des données pour 12h11", error);
     }
   }
 
   async getEveningDataForSpecificTime() {
     try {
       const response: any = await this.http
-        .get<{ humidity: string; temperature: string }>('http://localhost:3002/api/data/12h12')
+        .get<{ humidity: string; temperature: string }>('http://localhost:3002/api/data/09h55')
         .toPromise();
       this.humidity_23h14 = response.humidity + '%';
       this.temperature_23h14 = response.temperature + '°C';

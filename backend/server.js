@@ -80,11 +80,10 @@ const authenticate = (req, res, next) => {
 
   try {
     const decoded = jwt.verify(token, "secret_key");
-    req.userId = decoded.userId;
-    req.role = decoded.role;
+    req.user = { userId: decoded.userId, role: decoded.role }; // Corrigé
 
     // Vérifier si l'utilisateur a le rôle 'admin'
-    if (req.role !== "admin") {
+    if (decoded.role !== "admin") {
       return res
         .status(403)
         .json({ message: "Accès interdit, administrateur uniquement" });
@@ -459,7 +458,39 @@ app.post("/logout", authenticate, (req, res) => {
   res.status(200).json({ message: "Déconnexion réussie" });
 });
 // Démarrer le serveur
-const PORT = 3000;
+const PORT = 3001;
 app.listen(PORT, () => {
   console.log(`Serveur 2 démarré sur le port ${PORT}`);
+});
+// Démarrage du serveur
+server.listen(3000, () => {
+  console.log("Serveur démarré sur le port 3000");
+});
+
+app.get("/me", authenticate, async (req, res) => {
+  try {
+    // Utilisez l'ID de l'utilisateur extrait par le middleware authenticate
+    const user = await User.findById(req.user.userId).select(
+      "-mot_de_passe -__v"
+    ); // Exclut le mot de passe et d'autres champs sensibles
+
+    if (!user) {
+      return res.status(404).json({ message: "Utilisateur non trouvé." });
+    }
+
+    if (user.status === "inactif") {
+      return res.status(403).json({
+        message:
+          "Votre compte est inactif. Veuillez contacter l'administrateur.",
+      });
+    }
+
+    res.status(200).json(user);
+  } catch (error) {
+    console.error(
+      "Erreur lors de la récupération des informations utilisateur:",
+      error
+    );
+    res.status(500).json({ message: "Erreur serveur." });
+  }
 });

@@ -1,17 +1,15 @@
 import { Component, OnInit } from '@angular/core';
 import { AuthService } from '../auth.service';
 import { RouterModule } from '@angular/router';
-import  {CommonModule} from  '@angular/common';
-
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-sidebarsimple',
   standalone: true,
-  imports: [RouterModule,CommonModule],
+  imports: [RouterModule, CommonModule],
   templateUrl: './sidebarsimple.component.html',
-  styleUrl: './sidebarsimple.component.css'
+  styleUrl: './sidebarsimple.component.css',
 })
-
 export class SidebarsimpleComponent implements OnInit {
   toggleState: boolean = false;
   user: any = null; // Contiendra les données utilisateur
@@ -20,9 +18,9 @@ export class SidebarsimpleComponent implements OnInit {
 
   ngOnInit(): void {
     // Récupération des données utilisateur
-    this.authService.getUserProfile().subscribe(
-      (data) => {
-        this.user = data;
+    this.authService.getConnectedUser().subscribe(
+      (user) => {
+        this.user = user;
 
         // Ajouter l'URL complète pour la photo si elle est définie
         if (this.user.photo) {
@@ -57,4 +55,3 @@ export class SidebarsimpleComponent implements OnInit {
     }
   }
 }
-
