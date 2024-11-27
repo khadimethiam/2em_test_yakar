@@ -5,7 +5,6 @@ import { FormsModule } from '@angular/forms';
 import { SidebarComponent } from '../sidebar/sidebar.component';
 
 import * as bootstrap from 'bootstrap';
-import { NavComponent } from '../nav/nav.component';
 import { Router } from '@angular/router';
 
 interface User {
@@ -23,7 +22,7 @@ interface User {
 @Component({
   selector: 'app-user-list',
   standalone: true,
-  imports: [CommonModule, SidebarComponent, NavComponent, FormsModule],
+  imports: [CommonModule, SidebarComponent, FormsModule],
   templateUrl: './user-list.component.html',
   styleUrls: ['./user-list.component.css'],
 })
@@ -40,6 +39,10 @@ export class UserListComponent {
   searchPhone: string = ''; // Valeur du champ de recherche par numéro de téléphone
   showPassword = false; // Par défaut, le mot de passe est masqué
   displayedUsers: User[] = [];
+  searchNotFoundMessage: string = '';
+  activeFilter: string = 'all'; // Par défaut, 'all' (tous les utilisateurs)
+
+
 
   userPersonalInfo: User = {
     nom: '',
@@ -110,6 +113,8 @@ export class UserListComponent {
 
   // Filtrer les utilisateurs en fonction de leur rôle
   filterUsers(role: string) {
+    this.activeFilter = role; // Mettez à jour l'état du filtre actif
+
     if (role === 'user') {
       this.filteredUsers = this.users.filter((user) => user.role === 'user');
     } else if (role === 'admin') {
@@ -375,6 +380,9 @@ export class UserListComponent {
     }
   }
   onSearchPhone() {
+    // Réinitialiser le message de recherche non trouvé
+    this.searchNotFoundMessage = '';
+  
     if (this.searchPhone.trim() === '') {
       // Si la recherche est vide, on affiche tous les utilisateurs
       this.filteredUsers = this.users;
@@ -384,13 +392,19 @@ export class UserListComponent {
         user.numero_tel.includes(this.searchPhone)
       );
     }
-
+  
+    // Si aucun utilisateur n'a été trouvé après le filtrage
+    if (this.filteredUsers.length === 0) {
+      this.searchNotFoundMessage = 'Aucun utilisateur trouvé avec ce numéro de téléphone.';
+    }
+  
     // Met à jour la pagination
     this.totalItems = this.filteredUsers.length;
     this.totalPages = Math.ceil(this.totalItems / this.itemsPerPage);
     this.currentPage = 1; // Remet à zéro la pagination
     this.paginateUsers(); // Applique la pagination après le filtrage
   }
+  
 
   togglePasswordVisibility() {
     this.showPassword = !this.showPassword; // Bascule l'état de visibilité
