@@ -35,6 +35,8 @@ export class UpdateComponent implements OnInit {
   isSubmitting: boolean = false;
   errorMessage: string = '';
   successMessage: string = '';
+  invalidOldPasswordMessage: string = ''; // Message d'erreur spécifique à l'ancien mot de passe
+
 
   userPersonalInfo: User = {
     _id: '',
@@ -127,6 +129,7 @@ export class UpdateComponent implements OnInit {
           console.error('Ancien mot de passe invalide:', error);
           this.isSubmitting = false;
           this.errorMessage = 'Ancien mot de passe incorrect.';
+          this.invalidOldPasswordMessage = 'Mot de passe incorrect, veuillez réessayer à nouveau.';
         }
       );
   }
@@ -151,6 +154,49 @@ export class UpdateComponent implements OnInit {
     this.router.navigate(['/user-list']);
   }
 
+  validateNameOrPrenom(value: string): boolean {
+    const regex = /^(?!\s)(?!.*\s{2})(?![0-9]*$)[A-Za-zÀ-ÖØ-öø-ÿ\s]+$/; // Pas d'espace initial, pas de double espace, pas seulement des chiffres, caractères valides
+    return regex.test(value.trim());
+  }
+  
+  validatePhoneNumber(value: string): boolean {
+    const regex = /^(70|75|76|77|78)[0-9]{7}$/; // Doit commencer par 70, 75, 76, 77, 78 et avoir 9 chiffres au total
+    return regex.test(value);
+  }
+  
+  validatePassword(value: string): boolean {
+    return value.length >= 8; // Longueur minimale de 8 caractères
+  }
+  
+  onNameChange() {
+    const isValid = this.validateNameOrPrenom(this.userPersonalInfo.nom);
+    this.errorMessage = isValid ? '' : 'Nom invalide. Pas d’espaces initiaux/doubles ou caractères spéciaux.';
+  }
+  
+  onPrenomChange() {
+    const isValid = this.validateNameOrPrenom(this.userPersonalInfo.prenom);
+    this.errorMessage = isValid ? '' : 'Prénom invalide. Pas d’espaces initiaux/doubles ou caractères spéciaux.';
+  }
+  
+  onPhoneNumberChange() {
+    const isValid = this.validatePhoneNumber(this.userPersonalInfo.numero_tel);
+    this.errorMessage = isValid ? '' : 'Numéro invalide. Doit commencer par 70, 75, 76, 77 ou 78 et contenir 9 chiffres.';
+  }
+  
+  onNewPasswordChange() {
+    const isValid = this.validatePassword(this.userAccountInfo.password);
+    this.errorMessage = isValid ? '' : 'Le mot de passe doit contenir au moins 8 caractères.';
+  }
+  
+  validateEmail(value: string): boolean {
+    const regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/; // Format email standard
+    return regex.test(value);
+  }
+  
+  onEmailChange() {
+    const isValid = this.validateEmail(this.userPersonalInfo.email);
+    this.errorMessage = isValid ? '' : "Veuillez saisir une adresse email valide.";
+  }
   
   
 }
