@@ -2,26 +2,26 @@ import { Component, OnInit } from '@angular/core';
 import { AuthService } from '../auth.service'; // Adaptez le chemin selon votre projet
 import { RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { EditProfileComponent } from '../edit-profile/edit-profile.component';
 
 @Component({
   selector: 'app-sidebar',
   templateUrl: './sidebar.component.html',
   styleUrls: ['./sidebar.component.css'],
   standalone : true,
-  imports: [RouterModule,CommonModule,EditProfileComponent]
+  imports: [RouterModule,CommonModule]
 })
 
 export class SidebarComponent implements OnInit {
   toggleState: boolean = false;
   user: any = null; // Contiendra les données utilisateur
-  isEditProfileModalOpen = false; // Ajoutez cette propriété
+  userId: string = '';
 
   constructor(public authService: AuthService) {}
 
   ngOnInit(): void {
     // Récupération des données utilisateur
-    this.authService.getUserProfile().subscribe(
+    
+    this.authService.getConnectedUser().subscribe(
       (data) => {
         this.user = data;
 
@@ -39,9 +39,6 @@ export class SidebarComponent implements OnInit {
     );
   }
 
-  openEditProfileModal() {
-    this.isEditProfileModalOpen = true;
-  }
   // Fonction pour basculer l'état du toggle switch
   toggleSwitch() {
     this.toggleState = !this.toggleState;

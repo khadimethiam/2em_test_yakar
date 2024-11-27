@@ -46,7 +46,7 @@ mongoose
 // Configuration de Multer pour gérer les fichiers téléchargés (photos)
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, "../public/images/profil"); // Dossier où les fichiers seront stockés
+    cb(null, "../public/images/"); // Dossier où les fichiers seront stockés
   },
   filename: (req, file, cb) => {
     cb(null, `${Date.now()}-${file.originalname}`); // Nom unique du fichier
@@ -224,6 +224,48 @@ app.get("/profile", authenticate, async (req, res) => {
   } catch (err) {
     console.error("Erreur lors de la récupération du profil :", err);
     res.status(500).json({ message: "Erreur serveur" });
+  }
+});
+
+app.get("/me", authenticate, async (req, res) => {
+  try {
+    // Utilisez l'ID de l'utilisateur extrait par le middleware `authenticate`
+    const user = await User.findById(req.user.userId).select("-mot_de_passe -__v"); // Exclut le mot de passe et d'autres champs sensibles
+
+    if (!user) {
+      return res.status(404).json({ message: "Utilisateur non trouvé." });
+    }
+
+    if (user.status === "inactif") {
+      return res.status(403).json({ message: "Votre compte est inactif. Veuillez contacter l'administrateur." });
+    }
+
+    res.status(200).json(user);
+  } catch (error) {
+    console.error("Erreur lors de la récupération des informations utilisateur:", error);
+    res.status(500).json({ message: "Erreur serveur." });
+  }
+});
+
+
+
+//Route pour récupérer un utilisateur par son ID
+app.get('/:id', async (req, res) => {
+  try {
+    const userId = req.params.id; // Récupérer l'ID de l'utilisateur depuis les paramètres de l'URL
+
+    // Vérifier si l'utilisateur existe
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({ message: 'Utilisateur non trouvé.' });
+    }
+
+    // Réponse avec les données utilisateur
+    res.status(200).json(user);
+  } catch (error) {
+    console.error('Erreur lors de la récupération de l\'utilisateur:', error);
+    res.status(500).json({ message: 'Erreur serveur.' });
   }
 });
 

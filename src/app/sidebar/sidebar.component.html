@@ -6,6 +6,7 @@
     <div class="d-flex align-items-center position-relative profile-container">
       <!-- Photo de profil -->
       <div class="profile-photo-container">
+        
         <img
           *ngIf="user?.photo"
           [src]="user.photo"
@@ -24,13 +25,12 @@
 
       <!-- Sous-menu -->
       <div class="profile-menu">
-        <a (click)="openEditProfileModal()" class="profile-menu-item">Modifier le profil</a>
-      
+        <a routerLink="/edit-profile" class="profile-menu-item">Modifier le profil</a>
+
       </div>
     </div>
   </div>
 </nav>
-
 
 
 <!-- Sidebar -->
@@ -43,33 +43,19 @@
   <!-- Lien vers la gestion des utilisateurs -->
   <a routerLink="/user-list" routerLinkActive="active"><i class="fas fa-user"></i> Gestion des utilisateurs</a>
   <!-- Lien vers les paramètres -->
-  <a routerLink="/settings" routerLinkActive="active"><i class="fas fa-cog"></i> Paramètres</a>
+  
 
   <!-- Toggle switch positionné tout en bas -->
   <div class="toggle-container" (click)="toggleSwitch()">
-      <img src="/images/off.png" alt="Off" class="toggle-image" id="offIcon" />
+      <img src="/images/h.webp" alt="Off" class="toggle-image" id="offIcon" />
       <div class="toggle-switch" id="toggleSwitch">
           <div class="toggle-knob"></div>
       </div>
-      <img src="/images/on.gif" alt="On" class="toggle-image" id="onIcon" />
+      <img src="/images/200w.gif" alt="On" class="toggle-image" id="onIcon" />
   </div>
 
   <!-- Déconnexion en bas -->
   <a href="#" class="logout" (click)="authService.logout()">
       <i class="fas fa-sign-out-alt"></i> Déconnexion
   </a>
-</div>
-
-<!-- Contenu principal -->
-<div class="content p-4" style="margin-left: 250px;">
-  <div class="d-flex justify-content-between align-items-center mb-4">
-      <!-- Le contenu de votre page sera rendu ici selon la route -->
-      <router-outlet></router-outlet>
-      <!-- À la fin de votre template sidebar -->
-<app-edit-profile 
-*ngIf="isEditProfileModalOpen" 
-(close)="isEditProfileModalOpen = false"
->
-</app-edit-profile>
-  </div>
 </div>

@@ -118,7 +118,7 @@
                 class="form-control"
                 placeholder="Nouveau mot de passe"
                 required
-                minlength="6"
+                minlength="8"
                 #password="ngModel"
               />
               <span class="input-group-text" (click)="togglePasswordVisibility()">
@@ -126,7 +126,7 @@
               </span>
             </div>
             <div *ngIf="password.invalid && password.touched" class="text-danger">
-              Le mot de passe doit avoir au moins 6 caractères.
+              Le mot de passe doit avoir au moins 8 caractères.
             </div>
           </div>
 

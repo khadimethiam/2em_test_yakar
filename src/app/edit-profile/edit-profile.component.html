@@ -1,48 +1,42 @@
-<!-- edit-profile.component.html -->
-<div class="modal">
-    <div class="modal-content">
-      <h2>Modifier mon profil</h2>
-      <form [formGroup]="editProfileForm" (ngSubmit)="onSubmit()">
-        <div class="profile-photo-upload">
-          <img 
-            [src]="previewImage || 'assets/default-profile.png'" 
-            class="profile-preview"
-          >
-          <input 
-            type="file" 
-            (change)="onFileSelected($event)"
-            accept="image/*"
-            id="photoUpload"
-          >
-          <label for="photoUpload" class="upload-button">Changer la photo</label>
-        </div>
+<app-sidebar></app-sidebar>
+
+<div class="user-form-container">
+    <form [formGroup]="userForm" (ngSubmit)="saveChanges()">
+      <!-- Photo de l'utilisateur -->
+      <div class="user-photo-container">
+        <img class="user-photo" [src]="userForm.get('photo')?.value || '/images/profil.png'" alt="Photo utilisateur" />
+        <i class="edit-icon" (click)="toggleEditMode()" *ngIf="!isEditable">✏️</i>
+      </div>
   
-        <div class="form-group">
-          <label for="nom">Nom</label>
-          <input type="text" id="nom" formControlName="nom" required>
+      <!-- Détails de l'utilisateur -->
+      <div class="user-details">
+        <div class="detail-row">
+          <label for="prenom">Prénom :</label>
+          <span *ngIf="!isEditable" >{{ userForm.get('prenom')?.value }}</span>
+          <input *ngIf="isEditable" type="text" formControlName="prenom" />
         </div>
+        <div class="detail-row">
+          <label for="nom">Nom :</label>
+          <span *ngIf="!isEditable">{{ userForm.get('nom')?.value }}</span>
+          <input *ngIf="isEditable" type="text" formControlName="nom" />
+        </div>
+        <div class="detail-row">
+          <label for="nom">Email :</label>
+          <span *ngIf="!isEditable">{{ userForm.get('email')?.value }}</span>
+          <input *ngIf="isEditable" type="email" formControlName="email" />
+        </div>
+        <div class="detail-row">
+          <label for="telephone">Téléphone :</label>
+          <span *ngIf="!isEditable">{{ userForm.get('telephone')?.value }}</span>
+          <input *ngIf="isEditable" type="tel" formControlName="telephone" />
+        </div>
+      </div>
   
-        <div class="form-group">
-          <label for="prenom">Prénom</label>
-          <input type="text" id="prenom" formControlName="prenom" required>
-        </div>
-  
-        <div class="form-group">
-          <label for="email">Email</label>
-          <input type="email" id="email" formControlName="email" required>
-        </div>
-  
-        <div class="form-group">
-          <label for="numero_tel">Numéro de téléphone</label>
-          <input type="tel" id="numero_tel" formControlName="numero_tel" required>
-        </div>
-  
-        <div class="modal-actions">
-          <button type="submit" [disabled]="!editProfileForm.valid">
-            Enregistrer les modifications
-          </button>
-          <button type="button">Annuler</button>
-        </div>
-      </form>
-    </div>
+      <!-- Bouton Mettre à jour -->
+      <div class="actions">
+        <button type="button" class="btn btn-danger btn-sm" (click)="cancel()">Retour au dashboard</button>
+        <button type="submit" [ngClass]="{ 'blue-button': isEditable }" [disabled]="!isEditable || !userForm.valid || !userForm.dirty" (click)="saveChanges()">Mettre à jour</button>
+      </div>
+    </form>
   </div>
+  
