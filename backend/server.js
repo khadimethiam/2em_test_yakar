@@ -32,7 +32,7 @@ app.use(cors(corsOptions));
 app.use(bodyParser.json());
 
 // Middleware pour servir les fichiers d'images téléchargées depuis le dossier "uploads"
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+app.use('/public', express.static('public'));
 
 // Connexion à MongoDB
 mongoose
@@ -208,16 +208,18 @@ app.post("/login", async (req, res) => {
 // Route pour récupérer les informations de l'utilisateur connecté
 app.get("/profile", authenticate, async (req, res) => {
   try {
-    const user = await User.findById(req.user.userId).select("nom prenom photo"); // Corrigé
+    // Récupérer uniquement les champs nécessaires
+    const user = await User.findById(req.user.userId).select("nom prenom photo");
 
     if (!user) {
       return res.status(404).json({ message: "Utilisateur non trouvé" });
     }
 
+    // Construire la réponse
     const profile = {
       nom: user.nom,
       prenom: user.prenom,
-      photo: user.photo ? `/uploads/${user.photo}` : null,
+      photo: user.photo ? `../public/images/${user.photo}` : null, // Chemin public
     };
 
     res.status(200).json(profile);
@@ -226,6 +228,7 @@ app.get("/profile", authenticate, async (req, res) => {
     res.status(500).json({ message: "Erreur serveur" });
   }
 });
+
 
 app.get("/me", authenticate, async (req, res) => {
   try {

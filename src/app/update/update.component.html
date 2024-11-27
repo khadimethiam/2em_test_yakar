@@ -22,10 +22,11 @@
               class="form-control"
               placeholder="Saisir le nom"
               required
+              (ngModelChange)="onNameChange()"
               #nom="ngModel"
             />
-            <div *ngIf="nom.invalid && nom.touched" class="text-danger">
-              Le nom est requis.
+            <div *ngIf="errorMessage && !validateNameOrPrenom(userPersonalInfo.nom)" class="text-danger">
+              {{ errorMessage }}
             </div>
           </div>
 
@@ -39,10 +40,11 @@
               class="form-control"
               placeholder="Saisir le prénom"
               required
+              (ngModelChange)="onPrenomChange()"
               #prenom="ngModel"
             />
-            <div *ngIf="prenom.invalid && prenom.touched" class="text-danger">
-              Le prénom est requis.
+            <div *ngIf="errorMessage && !validateNameOrPrenom(userPersonalInfo.prenom)" class="text-danger">
+              {{ errorMessage }}
             </div>
           </div>
 
@@ -57,10 +59,11 @@
               placeholder="Saisir l'email"
               required
               email
+              (ngModelChange)="onEmailChange()"
               #email="ngModel"
             />
-            <div *ngIf="email.invalid && email.touched" class="text-danger">
-              Veuillez saisir une adresse email valide.
+            <div *ngIf="errorMessage && !validateEmail(userPersonalInfo.email)" class="text-danger">
+              {{ errorMessage }}
             </div>
           </div>
 
@@ -74,11 +77,11 @@
               class="form-control"
               placeholder="Ex: 770123456"
               required
-              pattern="^[0-9]{9}$"
+              (ngModelChange)="onPhoneNumberChange()"
               #numero_tel="ngModel"
             />
-            <div *ngIf="numero_tel.invalid && numero_tel.touched" class="text-danger">
-              Numéro invalide (9 chiffres requis).
+            <div *ngIf="errorMessage && !validatePhoneNumber(userPersonalInfo.numero_tel)" class="text-danger">
+              {{ errorMessage }}
             </div>
           </div>
         </div>
@@ -105,6 +108,9 @@
             <div *ngIf="oldPassword.invalid && oldPassword.touched" class="text-danger">
               L'ancien mot de passe est requis.
             </div>
+            <div *ngIf="invalidOldPasswordMessage" class="text-danger mt-1">
+              {{ invalidOldPasswordMessage }}
+            </div>
           </div>
 
           <div class="mb-3">
@@ -119,14 +125,15 @@
                 placeholder="Nouveau mot de passe"
                 required
                 minlength="8"
+                (ngModelChange)="onNewPasswordChange()"
                 #password="ngModel"
               />
               <span class="input-group-text" (click)="togglePasswordVisibility()">
                 <i class="bi" [ngClass]="showPassword ? 'bi-eye-slash' : 'bi-eye'"></i>
               </span>
             </div>
-            <div *ngIf="password.invalid && password.touched" class="text-danger">
-              Le mot de passe doit avoir au moins 8 caractères.
+            <div *ngIf="errorMessage && !validatePassword(userAccountInfo.password)" class="text-danger">
+              {{ errorMessage }}
             </div>
           </div>
 

@@ -11,6 +11,17 @@
   z-index: 1000; /* Toujours au-dessus des autres éléments */
 }
 
+.profile-link {
+  display: inline-block;  /* ou block si vous préférez */
+}
+
+.profile-photo-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+
 /* Conteneur de la photo de profil et du nom d'utilisateur */
 .navbar .container-fluid {
   display: flex;
@@ -181,7 +192,7 @@
     width: 250px;
   }
 }
-/* Conteneur du profil utilisateur */
+
 .profile-container {
   cursor: pointer;
 }

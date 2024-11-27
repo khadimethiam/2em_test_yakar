@@ -1,13 +1,14 @@
 /* Style global pour la page */
 .content-wrapper {
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-    margin-top: 20px; /* Espacement au-dessus */
-    padding: 20px;
-    width: 100%;
-  }
-  
+  display: flex;
+  justify-content: center;
+  align-items: center; /* Centrer verticalement */
+  margin-top: -75px; /* Espacement au-dessus */
+  padding: 20px;
+  width: 100%;
+  min-height: 100vh; /* S'assurer que le conteneur occupe toute la hauteur de la fenêtre */
+}
+
   /* Centrer la section contenant le formulaire */
   .card {
     background-color: #d1d2d3; /* Fond gris clair pour la carte */
