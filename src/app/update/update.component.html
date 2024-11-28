@@ -1,9 +1,7 @@
-
-
 <app-sidebar></app-sidebar>
 
-<div class="content-wrapper container-fluid">
-  <div *ngIf="showPersonalInfoForm || showAccountForm" class="card shadow-lg mb-4 mx-auto">
+<div class="content-wrapper container-fluid d-flex justify-content-center align-items-center" style="height: 100vh; background-color: #f8f9fa;">
+  <div class="card shadow-lg" style="width: 50rem; background-color: #ffffff;">
     <div class="card-body">
       <h5 class="card-title text-center mb-4">Mettre à jour l'Utilisateur</h5>
       <form
@@ -19,7 +17,7 @@
               id="nom"
               [(ngModel)]="userPersonalInfo.nom"
               name="nom"
-              class="form-control"
+              class="form-control form-control-line"
               placeholder="Saisir le nom"
               required
               (ngModelChange)="onNameChange()"
@@ -37,7 +35,7 @@
               id="prenom"
               [(ngModel)]="userPersonalInfo.prenom"
               name="prenom"
-              class="form-control"
+              class="form-control form-control-line"
               placeholder="Saisir le prénom"
               required
               (ngModelChange)="onPrenomChange()"
@@ -55,7 +53,7 @@
               id="email"
               [(ngModel)]="userPersonalInfo.email"
               name="email"
-              class="form-control"
+              class="form-control form-control-line"
               placeholder="Saisir l'email"
               required
               email
@@ -74,7 +72,7 @@
               id="numero_tel"
               [(ngModel)]="userPersonalInfo.numero_tel"
               name="numero_tel"
-              class="form-control"
+              class="form-control form-control-line"
               placeholder="Ex: 770123456"
               required
               (ngModelChange)="onPhoneNumberChange()"
@@ -96,7 +94,7 @@
                 id="oldPassword"
                 [(ngModel)]="userAccountInfo.oldPassword"
                 name="oldPassword"
-                class="form-control"
+                class="form-control form-control-line"
                 placeholder="Ancien mot de passe"
                 required
                 #oldPassword="ngModel"
@@ -111,45 +109,42 @@
             <div *ngIf="invalidOldPasswordMessage" class="text-danger mt-1">
               {{ invalidOldPasswordMessage }}
             </div>
-          </div>
 
-          <div class="mb-3">
-            <label for="password" class="form-label">Nouveau Mot de Passe</label>
-            <div class="input-group">
-              <input
-                type="{{ showPassword ? 'text' : 'password' }}"
-                id="password"
-                [(ngModel)]="userAccountInfo.password"
-                name="password"
-                class="form-control"
-                placeholder="Nouveau mot de passe"
-                required
-                minlength="8"
-                (ngModelChange)="onNewPasswordChange()"
-                #password="ngModel"
-              />
-              <span class="input-group-text" (click)="togglePasswordVisibility()">
-                <i class="bi" [ngClass]="showPassword ? 'bi-eye-slash' : 'bi-eye'"></i>
-              </span>
+            <div class="mb-3">
+              <label for="password" class="form-label">Nouveau Mot de Passe</label>
+              <div class="input-group">
+                <input
+                  type="{{ showPassword ? 'text' : 'password' }}"
+                  id="password"
+                  [(ngModel)]="userAccountInfo.password"
+                  name="password"
+                  class="form-control"
+                  placeholder="Nouveau mot de passe"
+                  required
+                  minlength="8"
+                  (ngModelChange)="onNewPasswordChange()"
+                  #password="ngModel"
+                />
+                <span class="input-group-text" (click)="togglePasswordVisibility()">
+                  <i class="bi" [ngClass]="showPassword ? 'bi-eye-slash' : 'bi-eye'"></i>
+                </span>
+              </div>
+              <div *ngIf="errorMessage && !validatePassword(userAccountInfo.password)" class="text-danger">
+                {{ errorMessage }}
+              </div>
             </div>
-            <div *ngIf="errorMessage && !validatePassword(userAccountInfo.password)" class="text-danger">
-              {{ errorMessage }}
+  
+            <div class="mb-3">
+              <label for="photo" class="form-label">Photo</label>
+              <input type="file" id="photo" (change)="onFileChange($event)" class="form-control" />
             </div>
           </div>
-
-          <div class="mb-3">
-            <label for="photo" class="form-label">Photo</label>
-            <input type="file" id="photo" (change)="onFileChange($event)" class="form-control" />
           </div>
-        </div>
+        
 
-        <div class="d-flex justify-content-between">
+        <div class="d-flex justify-content-between mt-4">
           <button type="button" class="btn btn-danger btn-sm" (click)="cancel()">Annuler</button>
-          <button
-            type="submit"
-            class="btn btn-primary btn-sm"
-            [disabled]="updateUserForm.invalid"
-          >
+          <button type="submit" class="btn btn-primary btn-sm" [disabled]="updateUserForm.invalid">
             {{ showPersonalInfoForm ? 'Suivant' : 'Enregistrer' }}
           </button>
         </div>

@@ -12,12 +12,13 @@
 /*     background-color: #fff;
 */  }
 .container {
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.10);
+  box-shadow: 0 4px 8px #007bff;
   border-radius: 30px;
   margin-left: 370px;
   position: relative;
   top: 40px; /* Déplace le container vers le bas */
   padding: 30px;
+  border: 1px solid #007bff;
 }
 .card-body {
 height: 500px;
@@ -106,7 +107,7 @@ border: none; /* Enlever la bordure */
 
 /* Appliquer une couleur verte pour le statut actif */
 .status-button.active {
-background-color: green;
+background-color: #40ce61;
 color: white;
 }
 
@@ -174,6 +175,7 @@ opacity: 0.9; /* Légère transparence au survol */
 .search-container {
 position: relative;
 width: 50%;
+
 }
 
 .search-icon {
@@ -191,7 +193,7 @@ padding-left: 30px; /* Ajoute de l'espace à gauche pour l'icône */
 
 .search-container .form-control-sm {
 border-radius: 20px; /* Arrondir les coins du champ de recherche */
-border: 1px solid #ced4da; /* Couleur du bord du champ de recherche */
+border: 2px solid #007bff; /* Couleur du bord du champ de recherche */
 padding-right: 10px; /* Espace à droite pour le texte */
 font-size: 14px; /* Taille du texte dans le champ */
 }

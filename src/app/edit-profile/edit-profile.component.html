@@ -1,45 +1,118 @@
 <app-sidebar></app-sidebar>
 
-<div class="user-form-container">
-    <form [formGroup]="userForm" (ngSubmit)="saveChanges()">
-      <!-- Photo de l'utilisateur -->
-      <div class="user-photo-container">
-        <img class="user-photo" [src]="userForm.get('photo')?.value !== null ? userForm.get('photo')?.value : '/images/profil.png'" alt="Photo utilisateur" />
-        <i class="edit-icon" (click)="toggleEditMode()" *ngIf="!isEditable">✏️</i>
-      </div>
-  
-      <!-- Détails de l'utilisateur -->
-      <div class="user-details">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Modifier le profil</title>
+  <!-- CDN Bootstrap -->
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+  />
+  <style>
+    .user-form-container {
+      max-width: 800px;
+      margin: 50px auto;
+      padding: 20px;
+      background-color: #f8f9fa;
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    .user-photo {
+      width: 150px;
+      height: 150px;
+      object-fit: cover;
+      border-radius: 50%;
+      margin: 20px auto;
+      display: block;
+    }
+    .btn {
+      width: 100%;
+      margin-top: 15px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="user-form-container">
+      <form [formGroup]="userForm" (ngSubmit)="saveChanges()">
+        <!-- Photo de l'utilisateur -->
+        <div class="text-center">
+          <img
+            class="user-photo img-thumbnail"
+            [src]="userForm.get('photo')?.value || '/images/profil.png'"
+            alt="Photo utilisateur"
+          />
+        </div>
+
+        <!-- Détails de l'utilisateur -->
+        <div class="row mt-4">
+          <div class="col-md-6 mb-3">
+            <label for="prenom" class="form-label">Prénom :</label>
+            <input
+              type="text"
+              formControlName="prenom"
+              class="form-control"
+              id="prenom"
+            />
+          </div>
+          <div class="col-md-6 mb-3">
+            <label for="nom" class="form-label">Nom :</label>
+            <input
+              type="text"
+              formControlName="nom"
+              class="form-control"
+              id="nom"
+            />
+          </div>
+        </div>
         <div class="row">
-        <div class="detail-row col">
-          <label for="prenom" class="col-sm-3">Prénom :</label>
-          <span *ngIf="!isEditable" >{{ userForm.get('prenom')?.value }}</span>
-          <input *ngIf="isEditable" type="text" formControlName="prenom" />
+          <div class="col-md-6 mb-3">
+            <label for="email" class="form-label">Email :</label>
+            <input
+              type="email"
+              formControlName="email"
+              class="form-control"
+              id="email"
+            />
+          </div>
+          <div class="col-md-6 mb-3">
+            <label for="telephone" class="form-label">Téléphone :</label>
+            <input
+              type="tel"
+              formControlName="telephone"
+              class="form-control"
+              id="telephone"
+            />
+          </div>
         </div>
-        <div class="detail-row col">
-          <label for="nom" class="col-sm-3">Nom :</label>
-          <span *ngIf="!isEditable">{{ userForm.get('nom')?.value }}</span>
-          <input *ngIf="isEditable" type="text" formControlName="nom" />
+
+        <!-- Boutons d'action -->
+        <div class="d-flex justify-content-between">
+          <button
+            type="button"
+            class="btn btn-danger"
+            (click)="cancel()"
+          >
+            Retour au dashboard
+          </button>
+          
+          <button
+            type="submit"
+            class="btn btn-primary"
+            [disabled]="!userForm.valid || !userForm.dirty"
+          >
+            Mettre à jour
+          </button>
         </div>
-      </div>
-      <div class="row">
-        <div class="detail-row col">
-          <label for="nom" class="col-sm-3">Email :</label>
-          <span *ngIf="!isEditable">{{ userForm.get('email')?.value }}</span>
-          <input *ngIf="isEditable" type="email" formControlName="email" />
-        </div>
-        <div class="detail-row col">
-          <label for="telephone" class="col-sm-3">Téléphone :</label>
-          <span *ngIf="!isEditable">{{ userForm.get('telephone')?.value }}</span>
-          <input *ngIf="isEditable" type="tel" formControlName="telephone" />
-        </div>
-      </div>
-      </div>
-  
-      <!-- Bouton Mettre à jour -->
-      <div class="actions">
-        <button type="button" class="btn btn-danger btn-sm" (click)="cancel()">Retour au dashboard</button>
-        <button type="submit" [ngClass]="{ 'blue-button': isEditable }" [disabled]="!isEditable || !userForm.valid || !userForm.dirty" (click)="saveChanges()">Mettre à jour</button>
-      </div>
-    </form>
+      </form>
+    </div>
   </div>
+  <script
+    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"
+  ></script>
+</body>
+</html>
+

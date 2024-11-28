@@ -1,9 +1,13 @@
 /* Style global pour la page */
 .content-wrapper {
+  background-image: url(/images/yaakar.png);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
   display: flex;
   justify-content: center;
   align-items: center; /* Centrer verticalement */
-  margin-top: -75px; /* Espacement au-dessus */
+  margin-top: -80px; /* Espacement au-dessus */
   padding: 20px;
   width: 100%;
   min-height: 100vh; /* S'assurer que le conteneur occupe toute la hauteur de la fenêtre */
@@ -13,11 +17,14 @@
   .card {
     background-color: #d1d2d3; /* Fond gris clair pour la carte */
     border-radius: 30px; /* Coins arrondis de la carte */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5); /* Ombre portée */
+    box-shadow: 0 4px 8px #007bff; /* Ombre portée */
     width: 100%;
     max-width: 800px; /* Largeur maximale */
     margin: auto;
     padding: 30px;
+    border: 2px solid #007bff;
+    
+    
   }
   
   /* Espacement autour du formulaire dans la carte */
@@ -93,5 +100,37 @@
     display: block;
     background: rgba(0, 0, 0, 0.5); /* Pour l'effet de fond sombre */
     transition: opacity 0.5s ease-in-out;
+  }
+  
+ /* .form-control-line {
+    border: none;
+    border-bottom: 1px solid #ccc;
+    border-radius: 0;
+    background-color: transparent;
+    transition: border-color 0.3s ease;
+  }
+
+  
+  .form-control-line:focus {
+    border-color: #007bff;
+    outline: none;
+    box-shadow: none;
+  }
+  */
+  .card {
+    padding: 2rem;
+  }
+  
+  .card-title {
+    color: #343a40;
+  }
+  
+  body {
+    height: 100vh;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #f8f9fa;
   }
   

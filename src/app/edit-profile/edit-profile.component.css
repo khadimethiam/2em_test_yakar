@@ -1,71 +1,100 @@
+
+
 .user-form-container {
-  max-width: 800px;
-  height: auto;
-  margin: 300px auto;
-  padding: 20px;
-  border-radius: 10px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  background: #fff;
+  width: 600px;
+  max-width: 90%;
+  padding: 40px;
+  border-radius: 17px;
+  border: 3px  #007bff;
+  background: #ffffff;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
+
+
 
 .user-photo-container {
   display: flex;
   justify-content: center;
   position: relative;
+  margin-bottom: 20px;
 }
 
 .user-photo {
-  width: 200px;
-  height: 200px;
+  width: 150px;
+  height: 150px;
   border-radius: 50%;
-}
-
-.edit-icon {
-  position: absolute;
-  bottom: 10px;
-  right: calc(50% - 10px);
-  cursor: pointer;
-  font-size: 1.5rem;
+  object-fit: cover;
+  border: 4px solid #007bff; /* Ajout d'une bordure bleue */
 }
 
 .user-details {
   margin-top: 20px;
-  margin-left: 30px;
-  justify-content: center;
 }
 
 .detail-row {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 50px;
+  align-items: center;
+  margin-bottom: 20px;
 }
 
 .detail-row label {
   font-weight: bold;
+  font-size: 1rem;
+  color: #495057;
+  width: 35%;
 }
 
 .detail-row span,
 .detail-row input {
   flex: 1;
-  margin-left: 10px;
+  margin-left: 15px;
+  font-size: 1rem;
+}
+
+.detail-row input {
+  padding: 10px;
+  border: 1px solid #ced4da;
+  border-radius: 8px;
+  background: #f8f9fa;
+  transition: border 0.3s ease, background 0.3s ease;
+}
+
+.detail-row input:focus {
+  border-color: #007bff;
+  background: #ffffff;
+  outline: none;
 }
 
 .actions {
   display: flex;
-  justify-content: space-between;
-  margin-top: 20px;
+   
+  gap: 80px; /* Ajouter un espacement horizontal important entre les boutons */
+  margin-top: 30px;
+ 
 }
 
 button {
-  padding: 10px 20px;
-  background: #ccc;
+  padding: 12px 30px;
+  font-size: 16px;
   border: none;
-  border-radius: 5px;
+  border-radius: 8px;
+  color: #ffffff;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+button:disabled {
+  background: #ccc;
   cursor: not-allowed;
 }
 
-button:enabled {
-  background: #007bff;
-  color: #fff;
-  cursor: pointer;
+.btn-danger {
+  background: #dc3545; /* Rouge pour le bouton de retour */
 }
+
+
+.blue-button {
+  background: #40ce61; /* Vert pour le bouton de mise à jour */
+}
+

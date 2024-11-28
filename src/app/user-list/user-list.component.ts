@@ -72,6 +72,9 @@ export class UserListComponent {
     this.router.navigate(['/update']);
   }
 
+
+  
+
   ngOnInit() {
     this.getUsers(); // Charger les utilisateurs au démarrage
   }
@@ -87,65 +90,96 @@ export class UserListComponent {
  
   // Méthode pour récupérer la liste des utilisateurs depuis l'API
   getUsers() {
-    const token = localStorage.getItem('token'); // Récupérer le token
+    const token = localStorage.getItem('token');
     const headers = new HttpHeaders({
-      Authorization: `Bearer ${token}`, // Ajouter le token aux en-têtes
+      Authorization: `Bearer ${token}`,
     });
-
-    this.http
-      .get<User[]>('http://localhost:3000/api/users', { headers })
+  
+    this.http.get<User[]>('http://localhost:3000/api/users', { headers })
       .subscribe(
         (response) => {
-          this.users = response; // La liste des utilisateurs avec statut est récupérée
-          this.filteredUsers = response; // Par défaut, on affiche tous les utilisateurs
-          this.totalItems = response.length;
-          this.totalPages = Math.ceil(this.totalItems / this.itemsPerPage); // Calcul du nombre total de pages
-          this.paginateUsers(); // Appel pour la pagination
+          this.users = response;
+          this.filteredUsers = response;
+          
+          // Calcul précis du nombre total d'éléments et de pages
+          this.totalItems = this.filteredUsers.length;
+          this.totalPages = Math.max(1, Math.ceil(this.totalItems / this.itemsPerPage));
+          
+          // Toujours initialiser la page courante à 1
+          this.currentPage = 1;
+          
+          // Appel explicite de la pagination
+          this.paginateUsers();
+          
+          // Ajout de logs de débogage
+          console.log('Total items:', this.totalItems);
+          console.log('Total pages:', this.totalPages);
+          console.log('Items per page:', this.itemsPerPage);
         },
         (error) => {
-          console.error(
-            'Erreur lors de la récupération des utilisateurs',
-            error
-          );
+          console.error('Erreur lors de la récupération des utilisateurs', error);
         }
       );
   }
-
   // Filtrer les utilisateurs en fonction de leur rôle
   filterUsers(role: string) {
-    this.activeFilter = role; // Mettez à jour l'état du filtre actif
-
+    this.activeFilter = role;
+  
+    // Filtrage des utilisateurs
     if (role === 'user') {
       this.filteredUsers = this.users.filter((user) => user.role === 'user');
     } else if (role === 'admin') {
       this.filteredUsers = this.users.filter((user) => user.role === 'admin');
     } else {
-      this.filteredUsers = [...this.users]; // Réinitialise aux utilisateurs complets
+      this.filteredUsers = [...this.users];
     }
   
-    // Mise à jour de la pagination
+    // Réinitialisation de la pagination
     this.totalItems = this.filteredUsers.length;
-    this.totalPages = Math.ceil(this.totalItems / this.itemsPerPage);
-    this.currentPage = 1; // Revenir à la première page après un changement de filtre
-    this.paginateUsers(); // Appliquer la pagination sur les utilisateurs filtrés
+    this.totalPages = Math.max(1, Math.ceil(this.totalItems / this.itemsPerPage));
+    this.currentPage = 1;
+    
+    // Pagination des utilisateurs filtrés
+    this.paginateUsers();
   }
   
 
   // Gérer la pagination et afficher les utilisateurs de la page actuelle
   paginateUsers() {
+    // Vérifiez que filteredUsers existe et n'est pas vide
+    if (!this.filteredUsers || this.filteredUsers.length === 0) {
+      this.displayedUsers = [];
+      this.totalPages = 0;
+      return;
+    }
+  
+    // Calcul précis de l'index de début
     const startIndex = (this.currentPage - 1) * this.itemsPerPage;
-    const paginated = this.filteredUsers.slice(
-      startIndex,
-      startIndex + this.itemsPerPage
-    );
-    this.displayedUsers = paginated; // Utilisez une nouvelle variable pour afficher les utilisateurs
+    const endIndex = Math.min(startIndex + this.itemsPerPage, this.filteredUsers.length);
+  
+    // Slice des utilisateurs
+    this.displayedUsers = this.filteredUsers.slice(startIndex, endIndex);
+  
+    // Recalcul du nombre total de pages
+    this.totalPages = Math.max(1, Math.ceil(this.filteredUsers.length / this.itemsPerPage));
+  
+    // Log de débogage
+    console.log('Paginate Users:', {
+      currentPage: this.currentPage,
+      startIndex: startIndex,
+      endIndex: endIndex,
+      displayedUsersCount: this.displayedUsers.length,
+      totalPages: this.totalPages
+    });
   }
+
+
 
   // Naviguer vers une page spécifique
   goToPage(page: number) {
     if (page >= 1 && page <= this.totalPages) {
       this.currentPage = page;
-      this.paginateUsers(); // Met à jour les utilisateurs affichés
+      this.paginateUsers();  // Met à jour les utilisateurs affichés
     }
   }
 
