@@ -6,22 +6,19 @@
     <div class="d-flex align-items-center position-relative profile-container">
       <!-- Photo de profil -->
       <div class="profile-photo-container">
+       
         <img
-          *ngIf="user?.photo ? user.photo : '/images/profil.png'"
-          [src]="user.photo"
-          alt="Photo de profil"
-          class="img-fluid rounded-circle profile-img"
-        />
-        <img
+          *ngIf="!user?.photo"
           src="/images/profil.png"
           alt="Photo par défaut"
           class="img-fluid rounded-circle profile-img"
         />
       </div>
       <!-- Nom et prénom de l'utilisateur -->
-      <span class="ms-2"> {{ user?.prenom }} {{ user?.nom }} </span>
+      <span class="ms-2">{{ user?.prenom }} {{ user?.nom }} </span>
 
       <!-- Sous-menu -->
+      
     </div>
   </div>
 </nav>
@@ -40,9 +37,6 @@
   <a routerLink="/dashboard" routerLinkActive="active"
     ><i class="fas fa-home"></i> Accueil</a
   >
-  <!-- Lien vers la gestion des utilisateurs -->
-
-  <!-- Lien vers les paramètres -->
 
   <!-- Toggle switch positionné tout en bas -->
   <div class="toggle-container" (click)="toggleSwitch()">
