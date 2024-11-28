@@ -1,4 +1,5 @@
 <!-- Navbar -->
+<!-- Navbar -->
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
   <div class="container-fluid justify-content-end">
     <!-- Conteneur du profil utilisateur -->
@@ -12,7 +13,6 @@
           class="img-fluid rounded-circle profile-img"
         />
         <img
-          *ngIf="!user?.photo"
           src="/images/profil.png"
           alt="Photo par défaut"
           class="img-fluid rounded-circle profile-img"
@@ -22,11 +22,6 @@
       <span class="ms-2">{{ user?.nom }} {{ user?.prenom }}</span>
 
       <!-- Sous-menu -->
-      <div class="profile-menu">
-        <a routerLink="/edit-profile" class="profile-menu-item"
-          >Modifier le profil</a
-        >
-      </div>
     </div>
   </div>
 </nav>
@@ -42,23 +37,37 @@
     />
   </div>
   <!-- Lien vers le dashboard -->
-  <a routerLink="/dashboard-simple" routerLinkActive="active"
+  <a routerLink="/dashboard" routerLinkActive="active"
     ><i class="fas fa-home"></i> Accueil</a
   >
   <!-- Lien vers la gestion des utilisateurs -->
 
   <!-- Lien vers les paramètres -->
-  <a routerLink="/settings" routerLinkActive="active"
-    ><i class="fas fa-cog"></i> Paramètres</a
-  >
 
   <!-- Toggle switch positionné tout en bas -->
   <div class="toggle-container" (click)="toggleSwitch()">
-    <img src="/images/h.webp" alt="Off" class="toggle-image" id="offIcon" />
+    <img
+      src="images/off.png"
+      alt="Off"
+      class="toggle-image"
+      id="offIcon"
+      [style.opacity]="toggleState ? '0' : '1'"
+    />
+
     <div class="toggle-switch" id="toggleSwitch">
-      <div class="toggle-knob"></div>
+      <div
+        class="toggle-knob"
+        [style.transform]="toggleState ? 'translateX(100%)' : 'translateX(0%)'"
+      ></div>
     </div>
-    <img src="/images/200w.gif" alt="On" class="toggle-image" id="onIcon" />
+
+    <img
+      src="images/on.gif"
+      alt="On"
+      class="toggle-image"
+      id="onIcon"
+      [style.opacity]="toggleState ? '1' : '0'"
+    />
   </div>
 
   <!-- Déconnexion en bas -->

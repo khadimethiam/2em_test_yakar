@@ -11,6 +11,16 @@
   z-index: 1000; /* Toujours au-dessus des autres éléments */
 }
 
+.profile-link {
+  display: inline-block; /* ou block si vous préférez */
+}
+
+.profile-photo-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 /* Conteneur de la photo de profil et du nom d'utilisateur */
 .navbar .container-fluid {
   display: flex;
@@ -48,7 +58,6 @@
     width: 200px; /* Réduction de la sidebar sur petit écran */
   }
 }
-
 
 /* Sidebar */
 .sidebar {
@@ -180,4 +189,37 @@
     display: block;
     width: 250px;
   }
+}
+
+.profile-container {
+  cursor: pointer;
+}
+
+.profile-container:hover .profile-menu {
+  display: block;
+}
+
+/* Sous-menu */
+.profile-menu {
+  display: none;
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  z-index: 10;
+}
+
+.profile-menu-item {
+  display: block;
+  padding: 10px 15px;
+  color: #333;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.profile-menu-item:hover {
+  background-color: #f8f9fa;
 }
